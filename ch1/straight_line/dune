@@ -1,0 +1,4 @@
+(executable
+  (name straight_line)
+  (libraries core_kernel)
+  (preprocess (pps ppx_jane)))
