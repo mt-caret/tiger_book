@@ -7,7 +7,7 @@ type binop =
   | Minus
   | Times
   | Div
-  [@@deriving sexp]
+[@@deriving sexp]
 
 type stm =
   | CompoundStm of stm * stm
@@ -18,7 +18,7 @@ and exp =
   | NumExp of int
   | OpExp of exp * binop * exp
   | EseqExp of stm * exp
-  [@@deriving sexp]
+[@@deriving sexp]
 
 let rec maxargs =
   let rec maxargs_exp =
