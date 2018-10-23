@@ -1,0 +1,4 @@
+(executable
+  (name json)
+  (libraries core_kernel)
+  (preprocess (pps ppx_jane)))
