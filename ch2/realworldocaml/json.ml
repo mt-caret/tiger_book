@@ -9,3 +9,5 @@ type t = [
   | `Null
   | `String of string
   ] [@@deriving sexp]
+
+let output_value t = sexp_of_t t |> print_s

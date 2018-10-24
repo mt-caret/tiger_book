@@ -1,4 +1,7 @@
 (executable
-  (name json)
-  (libraries core_kernel)
+  (name main)
+  (libraries core)
   (preprocess (pps ppx_jane)))
+
+(menhir (modules parser))
+(ocamllex (modules lexer))
