@@ -1,4 +1,3 @@
-(* taken from https://dev.realworldocaml.org/parsing-with-ocamllex-and-menhir.html *)
 {
 open Lexing
 open Parser
