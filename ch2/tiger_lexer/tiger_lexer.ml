@@ -15,24 +15,24 @@ let attempt_lex (lexbuf : Lexing.lexbuf) =
         Exn.to_string x
     )
 
-let run_lexer ~filename () =
+let run_lexer ~filename =
   let%map source_code = Reader.with_file filename ~f:Reader.contents in
   let lexbuf = Lexing.from_string source_code in
   let rec lex accum =
     let open Result.Let_syntax in
     match%bind attempt_lex lexbuf with
-    | Tokens.EOF -> Ok (Tokens.EOF :: accum)
+    | Tokens.EOF -> Ok (List.rev (Tokens.EOF :: accum))
     | token -> lex (token :: accum)
   in
   lex []
-  |> Result.map ~f:List.rev
-  |> printf !"%{sexp:(Tokens.token list, string) Result.t}\n"
 ;;
 
 let run_lexer_param =
   let open Command.Let_syntax in
   let%map_open filename = anon ("filename" %: file) in
-  run_lexer ~filename
+  fun () ->
+    run_lexer ~filename
+    >>| printf !"%{sexp:(Tokens.token list, string) Result.t}\n"
 ;;
 
 let () =
