@@ -1,6 +1,6 @@
 (executable
   (name tiger_lexer)
-  (libraries core)
+  (libraries async core)
   (preprocess (pps ppx_jane)))
 
 (ocamllex (modules lexer))

@@ -43,4 +43,4 @@ type token =
   | INT of int
   | ID of string
   | EOF
-[@@deriving sexp]
+[@@deriving sexp, compare]

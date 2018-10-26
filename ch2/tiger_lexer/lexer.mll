@@ -13,12 +13,12 @@ let next_line (lexbuf : Lexing.lexbuf) =
 ;;
 }
 
-let whitespace = ' ' '\t'
+let whitespace = ' ' | '\t'
 let newline = '\r' | '\n' | "\r\n"
 let formatting = whitespace | newline
 
 let digit = ['0'-'9']
-let int = ['1'-'9'] digit*
+let int = (['1'-'9'] digit*) | digit
 let id = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
 rule read =

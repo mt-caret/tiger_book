@@ -1,0 +1,317 @@
+testcases/merge.tig
+(Ok
+ (LET TYPE (ID any) EQ LBRACE (ID any) COLON (ID int) RBRACE VAR (ID buffer)
+  ASSIGN (ID getchar) LPAREN RPAREN FUNCTION (ID readint) LPAREN (ID any)
+  COLON (ID any) RPAREN COLON (ID int) EQ LET VAR (ID i) ASSIGN (INT 0)
+  FUNCTION (ID isdigit) LPAREN (ID s) COLON (ID string) RPAREN COLON 
+  (ID int) EQ (ID ord) LPAREN (ID buffer) RPAREN GE (ID ord) LPAREN
+  (STRING 0) RPAREN AND (ID ord) LPAREN (ID buffer) RPAREN LE (ID ord) LPAREN
+  (STRING 9) RPAREN FUNCTION (ID skipto) LPAREN RPAREN EQ WHILE (ID buffer)
+  EQ (STRING " ") OR (ID buffer) EQ (STRING "\n") DO (ID buffer) ASSIGN
+  (ID getchar) LPAREN RPAREN IN (ID skipto) LPAREN RPAREN SEMICOLON (ID any)
+  DOT (ID any) ASSIGN (ID isdigit) LPAREN (ID buffer) RPAREN SEMICOLON WHILE
+  (ID isdigit) LPAREN (ID buffer) RPAREN DO LPAREN (ID i) ASSIGN (ID i) TIMES
+  (INT 10) PLUS (ID ord) LPAREN (ID buffer) RPAREN MINUS (ID ord) LPAREN
+  (STRING 0) RPAREN SEMICOLON (ID buffer) ASSIGN (ID getchar) LPAREN RPAREN
+  RPAREN SEMICOLON (ID i) END TYPE (ID list) EQ LBRACE (ID first) COLON
+  (ID int) COMMA (ID rest) COLON (ID list) RBRACE FUNCTION (ID readlist)
+  LPAREN RPAREN COLON (ID list) EQ LET VAR (ID any) ASSIGN (ID any) LBRACE
+  (ID any) EQ (INT 0) RBRACE VAR (ID i) ASSIGN (ID readint) LPAREN (ID any)
+  RPAREN IN IF (ID any) DOT (ID any) THEN (ID list) LBRACE (ID first) EQ
+  (ID i) COMMA (ID rest) EQ (ID readlist) LPAREN RPAREN RBRACE ELSE NIL END
+  FUNCTION (ID merge) LPAREN (ID a) COLON (ID list) COMMA (ID b) COLON
+  (ID list) RPAREN COLON (ID list) EQ IF (ID a) EQ NIL THEN (ID b) ELSE IF
+  (ID b) EQ NIL THEN (ID a) ELSE IF (ID a) DOT (ID first) LT (ID b) DOT
+  (ID first) THEN (ID list) LBRACE (ID first) EQ (ID a) DOT (ID first) COMMA
+  (ID rest) EQ (ID merge) LPAREN (ID a) DOT (ID rest) COMMA (ID b) RPAREN
+  RBRACE ELSE (ID list) LBRACE (ID first) EQ (ID b) DOT (ID first) COMMA
+  (ID rest) EQ (ID merge) LPAREN (ID a) COMMA (ID b) DOT (ID rest) RPAREN
+  RBRACE FUNCTION (ID printint) LPAREN (ID i) COLON (ID int) RPAREN EQ LET
+  FUNCTION (ID f) LPAREN (ID i) COLON (ID int) RPAREN EQ IF (ID i) GT 
+  (INT 0) THEN LPAREN (ID f) LPAREN (ID i) DIVIDE (INT 10) RPAREN SEMICOLON
+  (ID print) LPAREN (ID chr) LPAREN (ID i) MINUS (ID i) DIVIDE (INT 10) TIMES
+  (INT 10) PLUS (ID ord) LPAREN (STRING 0) RPAREN RPAREN RPAREN RPAREN IN IF
+  (ID i) LT (INT 0) THEN LPAREN (ID print) LPAREN (STRING -) RPAREN SEMICOLON
+  (ID f) LPAREN MINUS (ID i) RPAREN RPAREN ELSE IF (ID i) GT (INT 0) THEN
+  (ID f) LPAREN (ID i) RPAREN ELSE (ID print) LPAREN (STRING 0) RPAREN END
+  FUNCTION (ID printlist) LPAREN (ID l) COLON (ID list) RPAREN EQ IF 
+  (ID l) EQ NIL THEN (ID print) LPAREN (STRING "\n") RPAREN ELSE LPAREN
+  (ID printint) LPAREN (ID l) DOT (ID first) RPAREN SEMICOLON (ID print)
+  LPAREN (STRING " ") RPAREN SEMICOLON (ID printlist) LPAREN (ID l) DOT
+  (ID rest) RPAREN RPAREN VAR (ID list1) ASSIGN (ID readlist) LPAREN RPAREN
+  VAR (ID list2) ASSIGN LPAREN (ID buffer) ASSIGN (ID getchar) LPAREN RPAREN
+  SEMICOLON (ID readlist) LPAREN RPAREN RPAREN IN (ID printlist) LPAREN
+  (ID merge) LPAREN (ID list1) COMMA (ID list2) RPAREN RPAREN END EOF))
+testcases/queens.tig
+(Ok
+ (LET VAR (ID N) ASSIGN (INT 8) TYPE (ID intArray) EQ ARRAY OF (ID int) VAR
+  (ID row) ASSIGN (ID intArray) LBRACK (ID N) RBRACK OF (INT 0) VAR (ID col)
+  ASSIGN (ID intArray) LBRACK (ID N) RBRACK OF (INT 0) VAR (ID diag1) ASSIGN
+  (ID intArray) LBRACK (ID N) PLUS (ID N) MINUS (INT 1) RBRACK OF (INT 0) VAR
+  (ID diag2) ASSIGN (ID intArray) LBRACK (ID N) PLUS (ID N) MINUS (INT 1)
+  RBRACK OF (INT 0) FUNCTION (ID printboard) LPAREN RPAREN EQ LPAREN FOR
+  (ID i) ASSIGN (INT 0) TO (ID N) MINUS (INT 1) DO LPAREN FOR (ID j) ASSIGN
+  (INT 0) TO (ID N) MINUS (INT 1) DO (ID print) LPAREN IF (ID col) LBRACK
+  (ID i) RBRACK EQ (ID j) THEN (STRING " O") ELSE (STRING " .") RPAREN
+  SEMICOLON (ID print) LPAREN (STRING "\n") RPAREN RPAREN SEMICOLON
+  (ID print) LPAREN (STRING "\n") RPAREN RPAREN FUNCTION (ID try) LPAREN
+  (ID c) COLON (ID int) RPAREN EQ LPAREN IF (ID c) EQ (ID N) THEN
+  (ID printboard) LPAREN RPAREN ELSE FOR (ID r) ASSIGN (INT 0) TO (ID N)
+  MINUS (INT 1) DO IF (ID row) LBRACK (ID r) RBRACK EQ (INT 0) AND (ID diag1)
+  LBRACK (ID r) PLUS (ID c) RBRACK EQ (INT 0) AND (ID diag2) LBRACK (ID r)
+  PLUS (INT 7) MINUS (ID c) RBRACK EQ (INT 0) THEN LPAREN (ID row) LBRACK
+  (ID r) RBRACK ASSIGN (INT 1) SEMICOLON (ID diag1) LBRACK (ID r) PLUS 
+  (ID c) RBRACK ASSIGN (INT 1) SEMICOLON (ID diag2) LBRACK (ID r) PLUS
+  (INT 7) MINUS (ID c) RBRACK ASSIGN (INT 1) SEMICOLON (ID col) LBRACK 
+  (ID c) RBRACK ASSIGN (ID r) SEMICOLON (ID try) LPAREN (ID c) PLUS (INT 1)
+  RPAREN SEMICOLON (ID row) LBRACK (ID r) RBRACK ASSIGN (INT 0) SEMICOLON
+  (ID diag1) LBRACK (ID r) PLUS (ID c) RBRACK ASSIGN (INT 0) SEMICOLON
+  (ID diag2) LBRACK (ID r) PLUS (INT 7) MINUS (ID c) RBRACK ASSIGN (INT 0)
+  RPAREN RPAREN IN (ID try) LPAREN (INT 0) RPAREN END EOF))
+testcases/test1.tig
+(Ok
+ (LET TYPE (ID arrtype) EQ ARRAY OF (ID int) VAR (ID arr1) COLON (ID arrtype)
+  ASSIGN (ID arrtype) LBRACK (INT 10) RBRACK OF (INT 0) IN (ID arr1) END EOF))
+testcases/test10.tig
+(Ok (WHILE LPAREN (INT 10) GT (INT 5) RPAREN DO (INT 5) PLUS (INT 6) EOF))
+testcases/test11.tig
+(Ok
+ (FOR (ID i) ASSIGN (INT 10) TO (STRING " ") DO (ID i) ASSIGN (ID i) MINUS
+  (INT 1) EOF))
+testcases/test12.tig
+(Ok
+ (LET VAR (ID a) ASSIGN (INT 0) IN FOR (ID i) ASSIGN (INT 0) TO (INT 100) DO
+  LPAREN (ID a) ASSIGN (ID a) PLUS (INT 1) SEMICOLON LPAREN RPAREN RPAREN END
+  EOF))
+testcases/test13.tig
+(Ok ((INT 3) GT (STRING df) EOF))
+testcases/test14.tig
+(Ok
+ (LET TYPE (ID arrtype) EQ ARRAY OF (ID int) TYPE (ID rectype) EQ LBRACE
+  (ID name) COLON (ID string) COMMA (ID id) COLON (ID int) RBRACE VAR
+  (ID rec) ASSIGN (ID rectype) LBRACE (ID name) EQ (STRING aname) COMMA
+  (ID id) EQ (INT 0) RBRACE VAR (ID arr) ASSIGN (ID arrtype) LBRACK (INT 3)
+  RBRACK OF (INT 0) IN IF (ID rec) NEQ (ID arr) THEN (INT 3) ELSE (INT 4) END
+  EOF))
+testcases/test15.tig
+(Ok (IF (INT 20) THEN (INT 3) EOF))
+testcases/test16.tig
+(Ok
+ (LET TYPE (ID a) EQ (ID c) TYPE (ID b) EQ (ID a) TYPE (ID c) EQ (ID d) TYPE
+  (ID d) EQ (ID a) IN (STRING "") END EOF))
+testcases/test17.tig
+(Ok
+ (LET TYPE (ID tree) EQ LBRACE (ID key) COLON (ID int) COMMA (ID children)
+  COLON (ID treelist) RBRACE VAR (ID d) COLON (ID int) ASSIGN (INT 0) TYPE
+  (ID treelist) EQ LBRACE (ID hd) COLON (ID tree) COMMA (ID tl) COLON
+  (ID treelist) RBRACE IN (ID d) END EOF))
+testcases/test18.tig
+(Ok
+ (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
+  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
+  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN VAR (ID d) ASSIGN
+  (INT 0) FUNCTION (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON
+  (ID string) EQ LPAREN (ID do_nothing1) LPAREN (ID d) COMMA (STRING str)
+  RPAREN SEMICOLON (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0)
+  COMMA (STRING str2) RPAREN END EOF))
+testcases/test19.tig
+(Ok
+ (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
+  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
+  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN FUNCTION
+  (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON (ID string) EQ
+  LPAREN (ID do_nothing1) LPAREN (ID a) COMMA (STRING str) RPAREN SEMICOLON
+  (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2)
+  RPAREN END EOF))
+testcases/test2.tig
+(Ok
+ (LET TYPE (ID myint) EQ (ID int) TYPE (ID arrtype) EQ ARRAY OF (ID myint)
+  VAR (ID arr1) COLON (ID arrtype) ASSIGN (ID arrtype) LBRACK (INT 10) RBRACK
+  OF (INT 0) IN (ID arr1) END EOF))
+testcases/test20.tig
+(Ok
+ (WHILE (INT 10) GT (INT 5) DO LPAREN (ID i) PLUS (INT 1) SEMICOLON LPAREN
+  RPAREN RPAREN EOF))
+testcases/test21.tig
+(Ok
+ (LET FUNCTION (ID nfactor) LPAREN (ID n) COLON (ID int) RPAREN EQ IF 
+  (ID n) EQ (INT 0) THEN (INT 1) ELSE (ID n) TIMES (ID nfactor) LPAREN 
+  (ID n) MINUS (INT 1) RPAREN IN (ID nfactor) LPAREN (INT 10) RPAREN END EOF))
+testcases/test22.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID rec1) ASSIGN (ID rectype) LBRACE (ID name) EQ
+  (STRING Name) COMMA (ID id) EQ (INT 0) RBRACE IN (ID rec1) DOT (ID nam)
+  ASSIGN (STRING asd) END EOF))
+testcases/test23.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID rec1) ASSIGN (ID rectype) LBRACE (ID name) EQ
+  (STRING aname) COMMA (ID id) EQ (INT 0) RBRACE IN (ID rec1) DOT (ID name)
+  ASSIGN (INT 3) SEMICOLON (ID rec1) DOT (ID id) ASSIGN (STRING "") END EOF))
+testcases/test24.tig
+(Ok (LET VAR (ID d) ASSIGN (INT 0) IN (ID d) LBRACK (INT 3) RBRACK END EOF))
+testcases/test25.tig
+(Ok (LET VAR (ID d) ASSIGN (INT 0) IN (ID d) DOT (ID f) END EOF))
+testcases/test26.tig
+(Ok ((INT 3) PLUS (STRING var) EOF))
+testcases/test27.tig
+(Ok
+ (LET VAR (ID a) ASSIGN (INT 0) FUNCTION (ID g) LPAREN (ID a) COLON (ID int)
+  RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (INT 2) RPAREN END EOF))
+testcases/test28.tig
+(Ok
+ (LET TYPE (ID rectype1) EQ LBRACE (ID name) COLON (ID string) COMMA 
+  (ID id) COLON (ID int) RBRACE TYPE (ID rectype2) EQ LBRACE (ID name) COLON
+  (ID string) COMMA (ID id) COLON (ID int) RBRACE VAR (ID rec1) COLON
+  (ID rectype1) ASSIGN (ID rectype2) LBRACE (ID name) EQ (STRING Name) COMMA
+  (ID id) EQ (INT 0) RBRACE IN (ID rec1) END EOF))
+testcases/test29.tig
+(Ok
+ (LET TYPE (ID arrtype1) EQ ARRAY OF (ID int) TYPE (ID arrtype2) EQ ARRAY OF
+  (ID int) VAR (ID arr1) COLON (ID arrtype1) ASSIGN (ID arrtype2) LBRACK
+  (INT 10) RBRACK OF (INT 0) IN (ID arr1) END EOF))
+testcases/test3.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID age)
+  COLON (ID int) RBRACE VAR (ID rec1) COLON (ID rectype) ASSIGN (ID rectype)
+  LBRACE (ID name) EQ (STRING Nobody) COMMA (ID age) EQ (INT 1000) RBRACE IN
+  (ID rec1) DOT (ID name) ASSIGN (STRING Somebody) SEMICOLON (ID rec1) END
+  EOF))
+testcases/test30.tig
+(Ok
+ (LET TYPE (ID a) EQ ARRAY OF (ID int) TYPE (ID b) EQ (ID a) VAR (ID arr1)
+  COLON (ID a) ASSIGN (ID b) LBRACK (INT 10) RBRACK OF (INT 0) IN (ID arr1)
+  LBRACK (INT 2) RBRACK END EOF))
+testcases/test31.tig
+(Ok (LET VAR (ID a) COLON (ID int) ASSIGN (STRING " ") IN (ID a) END EOF))
+testcases/test32.tig
+(Ok
+ (LET TYPE (ID arrayty) EQ ARRAY OF (ID int) VAR (ID a) ASSIGN (ID arrayty)
+  LBRACK (INT 10) RBRACK OF (STRING " ") IN (INT 0) END EOF))
+testcases/test33.tig
+(Ok (LET VAR (ID a) ASSIGN (ID rectype) LBRACE RBRACE IN (INT 0) END EOF))
+testcases/test34.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
+  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (STRING one)
+  COMMA (STRING two) RPAREN END EOF))
+testcases/test35.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
+  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (STRING one)
+  RPAREN END EOF))
+testcases/test36.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
+  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (INT 3) COMMA
+  (STRING one) COMMA (INT 5) RPAREN END EOF))
+testcases/test37.tig
+(Ok
+ (LET VAR (ID a) ASSIGN (INT 0) VAR (ID a) ASSIGN (STRING " ") IN (INT 0) END
+  EOF))
+testcases/test38.tig
+(Ok
+ (LET TYPE (ID a) EQ (ID int) TYPE (ID a) EQ (ID string) IN (INT 0) END EOF))
+testcases/test39.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int) EQ
+  (ID a) FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int)
+  EQ (ID a) IN (INT 0) END EOF))
+testcases/test4.tig
+(Ok
+ (LET FUNCTION (ID nfactor) LPAREN (ID n) COLON (ID int) RPAREN COLON
+  (ID int) EQ IF (ID n) EQ (INT 0) THEN (INT 1) ELSE (ID n) TIMES
+  (ID nfactor) LPAREN (ID n) MINUS (INT 1) RPAREN IN (ID nfactor) LPAREN
+  (INT 10) RPAREN END EOF))
+testcases/test40.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN EQ (ID a) IN 
+  (ID g) LPAREN (INT 2) RPAREN END EOF))
+testcases/test41.tig
+(Ok
+ (LET TYPE (ID a) EQ (ID int) IN LET TYPE (ID a) EQ (ID string) IN (INT 0)
+  END END EOF))
+testcases/test42.tig
+(Ok
+ (LET TYPE (ID arrtype1) EQ ARRAY OF (ID int) TYPE (ID rectype1) EQ LBRACE
+  (ID name) COLON (ID string) COMMA (ID address) COLON (ID string) COMMA
+  (ID id) COLON (ID int) COMMA (ID age) COLON (ID int) RBRACE TYPE
+  (ID arrtype2) EQ ARRAY OF (ID rectype1) TYPE (ID rectype2) EQ LBRACE
+  (ID name) COLON (ID string) COMMA (ID dates) COLON (ID arrtype1) RBRACE
+  TYPE (ID arrtype3) EQ ARRAY OF (ID string) VAR (ID arr1) ASSIGN
+  (ID arrtype1) LBRACK (INT 10) RBRACK OF (INT 0) VAR (ID arr2) ASSIGN
+  (ID arrtype2) LBRACK (INT 5) RBRACK OF (ID rectype1) LBRACE (ID name) EQ
+  (STRING aname) COMMA (ID address) EQ (STRING somewhere) COMMA (ID id) EQ
+  (INT 0) COMMA (ID age) EQ (INT 0) RBRACE VAR (ID arr3) COLON (ID arrtype3)
+  ASSIGN (ID arrtype3) LBRACK (INT 100) RBRACK OF (STRING "") VAR (ID rec1)
+  ASSIGN (ID rectype1) LBRACE (ID name) EQ (STRING Kapoios) COMMA
+  (ID address) EQ (STRING Kapou) COMMA (ID id) EQ (INT 0) (INT 2432) COMMA
+  (ID age) EQ (INT 44) RBRACE VAR (ID rec2) ASSIGN (ID rectype2) LBRACE
+  (ID name) EQ (STRING Allos) COMMA (ID dates) EQ (ID arrtype1) LBRACK
+  (INT 3) RBRACK OF (INT 1900) RBRACE IN (ID arr1) LBRACK (INT 0) RBRACK
+  ASSIGN (INT 1) SEMICOLON (ID arr1) LBRACK (INT 9) RBRACK ASSIGN (INT 3)
+  SEMICOLON (ID arr2) LBRACK (INT 3) RBRACK DOT (ID name) ASSIGN
+  (STRING kati) SEMICOLON (ID arr2) LBRACK (INT 1) RBRACK DOT (ID age) ASSIGN
+  (INT 23) SEMICOLON (ID arr3) LBRACK (INT 34) RBRACK ASSIGN (STRING sfd)
+  SEMICOLON (ID rec1) DOT (ID name) ASSIGN (STRING sdf) SEMICOLON (ID rec2)
+  DOT (ID dates) LBRACK (INT 0) RBRACK ASSIGN (INT 2323) SEMICOLON (ID rec2)
+  DOT (ID dates) LBRACK (INT 2) RBRACK ASSIGN (INT 2323) END EOF))
+testcases/test43.tig
+(Ok (LET VAR (ID a) ASSIGN LPAREN RPAREN IN (ID a) PLUS (INT 3) END EOF))
+testcases/test44.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID b) COLON (ID rectype) ASSIGN NIL IN (ID b)
+  ASSIGN NIL END EOF))
+testcases/test45.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID a) ASSIGN NIL IN (ID a) END EOF))
+testcases/test46.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID b) COLON (ID rectype) ASSIGN NIL IN (ID b) EQ
+  NIL SEMICOLON (ID b) NEQ NIL END EOF))
+testcases/test47.tig
+(Ok
+ (LET TYPE (ID a) EQ (ID int) VAR (ID b) ASSIGN (INT 4) TYPE (ID a) EQ
+  (ID string) IN (INT 0) END EOF))
+testcases/test48.tig
+(Ok
+ (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int) EQ
+  (ID a) TYPE (ID t) EQ (ID int) FUNCTION (ID g) LPAREN (ID a) COLON 
+  (ID int) RPAREN COLON (ID int) EQ (ID a) IN (INT 0) END EOF))
+testcases/test49.tig
+(Ok
+ (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
+  COLON (ID int) RBRACE VAR (ID a) ASSIGN (ID rectype) NIL IN (ID a) END EOF))
+testcases/test5.tig
+(Ok
+ (LET TYPE (ID intlist) EQ LBRACE (ID hd) COLON (ID int) COMMA (ID tl) COLON
+  (ID intlist) RBRACE TYPE (ID tree) EQ LBRACE (ID key) COLON (ID int) COMMA
+  (ID children) COLON (ID treelist) RBRACE TYPE (ID treelist) EQ LBRACE
+  (ID hd) COLON (ID tree) COMMA (ID tl) COLON (ID treelist) RBRACE VAR
+  (ID lis) COLON (ID intlist) ASSIGN (ID intlist) LBRACE (ID hd) EQ (INT 0)
+  COMMA (ID tl) EQ NIL RBRACE IN (ID lis) END EOF))
+testcases/test6.tig
+(Ok
+ (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
+  COLON (ID string) RPAREN EQ (ID do_nothing2) LPAREN (ID a) PLUS (INT 1)
+  RPAREN FUNCTION (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN EQ
+  (ID do_nothing1) LPAREN (ID d) COMMA (STRING str) RPAREN IN
+  (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2) RPAREN END EOF))
+testcases/test7.tig
+(Ok
+ (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
+  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
+  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN FUNCTION
+  (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON (ID string) EQ
+  LPAREN (ID do_nothing1) LPAREN (ID d) COMMA (STRING str) RPAREN SEMICOLON
+  (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2)
+  RPAREN END EOF))
+testcases/test8.tig
+(Ok (IF LPAREN (INT 10) GT (INT 20) RPAREN THEN (INT 30) ELSE (INT 40) EOF))
+testcases/test9.tig
+(Ok
+ (IF LPAREN (INT 5) GT (INT 4) RPAREN THEN (INT 13) ELSE (STRING " ") EOF))
