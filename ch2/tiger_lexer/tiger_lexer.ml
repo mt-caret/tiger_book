@@ -1,6 +1,6 @@
 open Core
-open Lexer
-open Lexing
+(* open Lexer
+ * open Lexing *)
 
 let () = printf "Hello, World!\n"
 
