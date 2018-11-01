@@ -77,7 +77,7 @@ and read_comment =
   | "*/" { () }
   | "/*" { read_comment lexbuf; read_comment lexbuf }
   | _    { read_comment lexbuf }
-  | eof  { raise (SyntaxError ("Comment is not terminated")) }
+  | eof  { raise (SyntaxError "Comment is not terminated") }
 
 and read_string buf =
   parse
