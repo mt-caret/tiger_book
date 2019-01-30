@@ -1,317 +1,755 @@
 testcases/merge.tig
 (Ok
- (LET TYPE (ID any) EQ LBRACE (ID any) COLON (ID int) RBRACE VAR (ID buffer)
-  ASSIGN (ID getchar) LPAREN RPAREN FUNCTION (ID readint) LPAREN (ID any)
-  COLON (ID any) RPAREN COLON (ID int) EQ LET VAR (ID i) ASSIGN (INT 0)
-  FUNCTION (ID isdigit) LPAREN (ID s) COLON (ID string) RPAREN COLON 
-  (ID int) EQ (ID ord) LPAREN (ID buffer) RPAREN GE (ID ord) LPAREN
-  (STRING 0) RPAREN AND (ID ord) LPAREN (ID buffer) RPAREN LE (ID ord) LPAREN
-  (STRING 9) RPAREN FUNCTION (ID skipto) LPAREN RPAREN EQ WHILE (ID buffer)
-  EQ (STRING " ") OR (ID buffer) EQ (STRING "\n") DO (ID buffer) ASSIGN
-  (ID getchar) LPAREN RPAREN IN (ID skipto) LPAREN RPAREN SEMICOLON (ID any)
-  DOT (ID any) ASSIGN (ID isdigit) LPAREN (ID buffer) RPAREN SEMICOLON WHILE
-  (ID isdigit) LPAREN (ID buffer) RPAREN DO LPAREN (ID i) ASSIGN (ID i) TIMES
-  (INT 10) PLUS (ID ord) LPAREN (ID buffer) RPAREN MINUS (ID ord) LPAREN
-  (STRING 0) RPAREN SEMICOLON (ID buffer) ASSIGN (ID getchar) LPAREN RPAREN
-  RPAREN SEMICOLON (ID i) END TYPE (ID list) EQ LBRACE (ID first) COLON
-  (ID int) COMMA (ID rest) COLON (ID list) RBRACE FUNCTION (ID readlist)
-  LPAREN RPAREN COLON (ID list) EQ LET VAR (ID any) ASSIGN (ID any) LBRACE
-  (ID any) EQ (INT 0) RBRACE VAR (ID i) ASSIGN (ID readint) LPAREN (ID any)
-  RPAREN IN IF (ID any) DOT (ID any) THEN (ID list) LBRACE (ID first) EQ
-  (ID i) COMMA (ID rest) EQ (ID readlist) LPAREN RPAREN RBRACE ELSE NIL END
-  FUNCTION (ID merge) LPAREN (ID a) COLON (ID list) COMMA (ID b) COLON
-  (ID list) RPAREN COLON (ID list) EQ IF (ID a) EQ NIL THEN (ID b) ELSE IF
-  (ID b) EQ NIL THEN (ID a) ELSE IF (ID a) DOT (ID first) LT (ID b) DOT
-  (ID first) THEN (ID list) LBRACE (ID first) EQ (ID a) DOT (ID first) COMMA
-  (ID rest) EQ (ID merge) LPAREN (ID a) DOT (ID rest) COMMA (ID b) RPAREN
-  RBRACE ELSE (ID list) LBRACE (ID first) EQ (ID b) DOT (ID first) COMMA
-  (ID rest) EQ (ID merge) LPAREN (ID a) COMMA (ID b) DOT (ID rest) RPAREN
-  RBRACE FUNCTION (ID printint) LPAREN (ID i) COLON (ID int) RPAREN EQ LET
-  FUNCTION (ID f) LPAREN (ID i) COLON (ID int) RPAREN EQ IF (ID i) GT 
-  (INT 0) THEN LPAREN (ID f) LPAREN (ID i) DIVIDE (INT 10) RPAREN SEMICOLON
-  (ID print) LPAREN (ID chr) LPAREN (ID i) MINUS (ID i) DIVIDE (INT 10) TIMES
-  (INT 10) PLUS (ID ord) LPAREN (STRING 0) RPAREN RPAREN RPAREN RPAREN IN IF
-  (ID i) LT (INT 0) THEN LPAREN (ID print) LPAREN (STRING -) RPAREN SEMICOLON
-  (ID f) LPAREN MINUS (ID i) RPAREN RPAREN ELSE IF (ID i) GT (INT 0) THEN
-  (ID f) LPAREN (ID i) RPAREN ELSE (ID print) LPAREN (STRING 0) RPAREN END
-  FUNCTION (ID printlist) LPAREN (ID l) COLON (ID list) RPAREN EQ IF 
-  (ID l) EQ NIL THEN (ID print) LPAREN (STRING "\n") RPAREN ELSE LPAREN
-  (ID printint) LPAREN (ID l) DOT (ID first) RPAREN SEMICOLON (ID print)
-  LPAREN (STRING " ") RPAREN SEMICOLON (ID printlist) LPAREN (ID l) DOT
-  (ID rest) RPAREN RPAREN VAR (ID list1) ASSIGN (ID readlist) LPAREN RPAREN
-  VAR (ID list2) ASSIGN LPAREN (ID buffer) ASSIGN (ID getchar) LPAREN RPAREN
-  SEMICOLON (ID readlist) LPAREN RPAREN RPAREN IN (ID printlist) LPAREN
-  (ID merge) LPAREN (ID list1) COMMA (ID list2) RPAREN RPAREN END EOF))
+ (Let
+  (((Type_dec ((name any) (type_ (Record ((any int))))))
+    (Var_dec
+     ((var_name buffer) (var_type_annotation ())
+      (var_content (Function_call (getchar ())))))
+    (Func_dec
+     ((func_name readint) (arguments ((any any)))
+      (func_type_annotation (int))
+      (func_content
+       (Let
+        (((Var_dec
+           ((var_name i) (var_type_annotation ())
+            (var_content (Integer_literal 0))))
+          (Func_dec
+           ((func_name isdigit) (arguments ((s string)))
+            (func_type_annotation (int))
+            (func_content
+             (And
+              ((Ge
+                ((Function_call (ord ((L_value (Id buffer)))))
+                 (Function_call (ord ((String_literal 0))))))
+               (Le
+                ((Function_call (ord ((L_value (Id buffer)))))
+                 (Function_call (ord ((String_literal 9)))))))))))
+          (Func_dec
+           ((func_name skipto) (arguments ()) (func_type_annotation ())
+            (func_content
+             (While
+              ((Or
+                ((Eq ((L_value (Id buffer)) (String_literal " ")))
+                 (Eq ((L_value (Id buffer)) (String_literal "\n")))))
+               (Assignment ((Id buffer) (Function_call (getchar ()))))))))))
+         ((Function_call (skipto ()))
+          (Assignment
+           ((Record_access ((Id any) any))
+            (Function_call (isdigit ((L_value (Id buffer)))))))
+          (While
+           ((Function_call (isdigit ((L_value (Id buffer)))))
+            (Sequence
+             ((Assignment
+               ((Id i)
+                (Subtraction
+                 ((Addition
+                   ((Multiplication ((L_value (Id i)) (Integer_literal 10)))
+                    (Function_call (ord ((L_value (Id buffer)))))))
+                  (Function_call (ord ((String_literal 0))))))))
+              (Assignment ((Id buffer) (Function_call (getchar ()))))))))
+          (L_value (Id i))))))))
+    (Type_dec ((name list) (type_ (Record ((first int) (rest list))))))
+    (Func_dec
+     ((func_name readlist) (arguments ()) (func_type_annotation (list))
+      (func_content
+       (Let
+        (((Var_dec
+           ((var_name any) (var_type_annotation ())
+            (var_content (Record (any ((any (Integer_literal 0))))))))
+          (Var_dec
+           ((var_name i) (var_type_annotation ())
+            (var_content (Function_call (readint ((L_value (Id any)))))))))
+         ((If_then_else
+           ((L_value (Record_access ((Id any) any)))
+            (Record
+             (list
+              ((first (L_value (Id i))) (rest (Function_call (readlist ()))))))
+            Nil))))))))
+    (Func_dec
+     ((func_name merge) (arguments ((a list) (b list)))
+      (func_type_annotation (list))
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id a)) Nil)) (L_value (Id b))
+         (If_then_else
+          ((Eq ((L_value (Id b)) Nil)) (L_value (Id a))
+           (If_then_else
+            ((Lt
+              ((L_value (Record_access ((Id a) first)))
+               (L_value (Record_access ((Id b) first)))))
+             (Record
+              (list
+               ((first (L_value (Record_access ((Id a) first))))
+                (rest
+                 (Function_call
+                  (merge
+                   ((L_value (Record_access ((Id a) rest))) (L_value (Id b)))))))))
+             (Record
+              (list
+               ((first (L_value (Record_access ((Id b) first))))
+                (rest
+                 (Function_call
+                  (merge
+                   ((L_value (Id a)) (L_value (Record_access ((Id b) rest)))))))))))))))))))
+    (Func_dec
+     ((func_name printint) (arguments ((i int))) (func_type_annotation ())
+      (func_content
+       (Let
+        (((Func_dec
+           ((func_name f) (arguments ((i int))) (func_type_annotation ())
+            (func_content
+             (If_then
+              ((Gt ((L_value (Id i)) (Integer_literal 0)))
+               (Sequence
+                ((Function_call
+                  (f ((Division ((L_value (Id i)) (Integer_literal 10))))))
+                 (Function_call
+                  (print
+                   ((Function_call
+                     (chr
+                      ((Addition
+                        ((Subtraction
+                          ((L_value (Id i))
+                           (Multiplication
+                            ((Division
+                              ((L_value (Id i)) (Integer_literal 10)))
+                             (Integer_literal 10)))))
+                         (Function_call (ord ((String_literal 0))))))))))))))))))))
+         ((If_then_else
+           ((Lt ((L_value (Id i)) (Integer_literal 0)))
+            (Sequence
+             ((Function_call (print ((String_literal -))))
+              (Function_call (f ((Negation (L_value (Id i))))))))
+            (If_then_else
+             ((Gt ((L_value (Id i)) (Integer_literal 0)))
+              (Function_call (f ((L_value (Id i)))))
+              (Function_call (print ((String_literal 0))))))))))))))
+    (Func_dec
+     ((func_name printlist) (arguments ((l list))) (func_type_annotation ())
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id l)) Nil))
+         (Function_call (print ((String_literal "\n"))))
+         (Sequence
+          ((Function_call
+            (printint ((L_value (Record_access ((Id l) first))))))
+           (Function_call (print ((String_literal " "))))
+           (Function_call
+            (printlist ((L_value (Record_access ((Id l) rest)))))))))))))
+    (Var_dec
+     ((var_name list1) (var_type_annotation ())
+      (var_content (Function_call (readlist ())))))
+    (Var_dec
+     ((var_name list2) (var_type_annotation ())
+      (var_content
+       (Sequence
+        ((Assignment ((Id buffer) (Function_call (getchar ()))))
+         (Function_call (readlist ()))))))))
+   ((Function_call
+     (printlist
+      ((Function_call (merge ((L_value (Id list1)) (L_value (Id list2))))))))))))
 testcases/queens.tig
 (Ok
- (LET VAR (ID N) ASSIGN (INT 8) TYPE (ID intArray) EQ ARRAY OF (ID int) VAR
-  (ID row) ASSIGN (ID intArray) LBRACK (ID N) RBRACK OF (INT 0) VAR (ID col)
-  ASSIGN (ID intArray) LBRACK (ID N) RBRACK OF (INT 0) VAR (ID diag1) ASSIGN
-  (ID intArray) LBRACK (ID N) PLUS (ID N) MINUS (INT 1) RBRACK OF (INT 0) VAR
-  (ID diag2) ASSIGN (ID intArray) LBRACK (ID N) PLUS (ID N) MINUS (INT 1)
-  RBRACK OF (INT 0) FUNCTION (ID printboard) LPAREN RPAREN EQ LPAREN FOR
-  (ID i) ASSIGN (INT 0) TO (ID N) MINUS (INT 1) DO LPAREN FOR (ID j) ASSIGN
-  (INT 0) TO (ID N) MINUS (INT 1) DO (ID print) LPAREN IF (ID col) LBRACK
-  (ID i) RBRACK EQ (ID j) THEN (STRING " O") ELSE (STRING " .") RPAREN
-  SEMICOLON (ID print) LPAREN (STRING "\n") RPAREN RPAREN SEMICOLON
-  (ID print) LPAREN (STRING "\n") RPAREN RPAREN FUNCTION (ID try) LPAREN
-  (ID c) COLON (ID int) RPAREN EQ LPAREN IF (ID c) EQ (ID N) THEN
-  (ID printboard) LPAREN RPAREN ELSE FOR (ID r) ASSIGN (INT 0) TO (ID N)
-  MINUS (INT 1) DO IF (ID row) LBRACK (ID r) RBRACK EQ (INT 0) AND (ID diag1)
-  LBRACK (ID r) PLUS (ID c) RBRACK EQ (INT 0) AND (ID diag2) LBRACK (ID r)
-  PLUS (INT 7) MINUS (ID c) RBRACK EQ (INT 0) THEN LPAREN (ID row) LBRACK
-  (ID r) RBRACK ASSIGN (INT 1) SEMICOLON (ID diag1) LBRACK (ID r) PLUS 
-  (ID c) RBRACK ASSIGN (INT 1) SEMICOLON (ID diag2) LBRACK (ID r) PLUS
-  (INT 7) MINUS (ID c) RBRACK ASSIGN (INT 1) SEMICOLON (ID col) LBRACK 
-  (ID c) RBRACK ASSIGN (ID r) SEMICOLON (ID try) LPAREN (ID c) PLUS (INT 1)
-  RPAREN SEMICOLON (ID row) LBRACK (ID r) RBRACK ASSIGN (INT 0) SEMICOLON
-  (ID diag1) LBRACK (ID r) PLUS (ID c) RBRACK ASSIGN (INT 0) SEMICOLON
-  (ID diag2) LBRACK (ID r) PLUS (INT 7) MINUS (ID c) RBRACK ASSIGN (INT 0)
-  RPAREN RPAREN IN (ID try) LPAREN (INT 0) RPAREN END EOF))
+ (Let
+  (((Var_dec
+     ((var_name N) (var_type_annotation ())
+      (var_content (Integer_literal 8))))
+    (Type_dec ((name intArray) (type_ (Array int))))
+    (Var_dec
+     ((var_name row) (var_type_annotation ())
+      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name col) (var_type_annotation ())
+      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name diag1) (var_type_annotation ())
+      (var_content
+       (Array
+        (intArray
+         (Subtraction
+          ((Addition ((L_value (Id N)) (L_value (Id N))))
+           (Integer_literal 1)))
+         (Integer_literal 0))))))
+    (Var_dec
+     ((var_name diag2) (var_type_annotation ())
+      (var_content
+       (Array
+        (intArray
+         (Subtraction
+          ((Addition ((L_value (Id N)) (L_value (Id N))))
+           (Integer_literal 1)))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name printboard) (arguments ()) (func_type_annotation ())
+      (func_content
+       (Sequence
+        ((For
+          (i (Integer_literal 0)
+           (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+           (Sequence
+            ((For
+              (j (Integer_literal 0)
+               (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+               (Function_call
+                (print
+                 ((If_then_else
+                   ((Eq
+                     ((L_value (Array_access ((Id col) (L_value (Id i)))))
+                      (L_value (Id j))))
+                    (String_literal " O") (String_literal " ."))))))))
+             (Function_call (print ((String_literal "\n"))))))))
+         (Function_call (print ((String_literal "\n")))))))))
+    (Func_dec
+     ((func_name try) (arguments ((c int))) (func_type_annotation ())
+      (func_content
+       (Parentheses
+        (If_then_else
+         ((Eq ((L_value (Id c)) (L_value (Id N))))
+          (Function_call (printboard ()))
+          (For
+           (r (Integer_literal 0)
+            (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+            (If_then
+             ((And
+               ((And
+                 ((Eq
+                   ((L_value (Array_access ((Id row) (L_value (Id r)))))
+                    (Integer_literal 0)))
+                  (Eq
+                   ((L_value
+                     (Array_access
+                      ((Id diag1)
+                       (Addition ((L_value (Id r)) (L_value (Id c)))))))
+                    (Integer_literal 0)))))
+                (Eq
+                 ((L_value
+                   (Array_access
+                    ((Id diag2)
+                     (Subtraction
+                      ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                       (L_value (Id c)))))))
+                  (Integer_literal 0)))))
+              (Sequence
+               ((Assignment
+                 ((Array_access ((Id row) (L_value (Id r))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag1)
+                    (Addition ((L_value (Id r)) (L_value (Id c))))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag2)
+                    (Subtraction
+                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                      (L_value (Id c))))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access ((Id col) (L_value (Id c))))
+                  (L_value (Id r))))
+                (Function_call
+                 (try ((Addition ((L_value (Id c)) (Integer_literal 1))))))
+                (Assignment
+                 ((Array_access ((Id row) (L_value (Id r))))
+                  (Integer_literal 0)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag1)
+                    (Addition ((L_value (Id r)) (L_value (Id c))))))
+                  (Integer_literal 0)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag2)
+                    (Subtraction
+                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                      (L_value (Id c))))))
+                  (Integer_literal 0))))))))))))))))
+   ((Function_call (try ((Integer_literal 0))))))))
 testcases/test1.tig
 (Ok
- (LET TYPE (ID arrtype) EQ ARRAY OF (ID int) VAR (ID arr1) COLON (ID arrtype)
-  ASSIGN (ID arrtype) LBRACK (INT 10) RBRACK OF (INT 0) IN (ID arr1) END EOF))
+ (Let
+  (((Type_dec ((name arrtype) (type_ (Array int))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype))
+      (var_content
+       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
 testcases/test10.tig
-(Ok (WHILE LPAREN (INT 10) GT (INT 5) RPAREN DO (INT 5) PLUS (INT 6) EOF))
+(Ok
+ (While
+  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 5))))
+   (Addition ((Integer_literal 5) (Integer_literal 6))))))
 testcases/test11.tig
 (Ok
- (FOR (ID i) ASSIGN (INT 10) TO (STRING " ") DO (ID i) ASSIGN (ID i) MINUS
-  (INT 1) EOF))
+ (For
+  (i (Integer_literal 10) (String_literal " ")
+   (Assignment ((Id i) (Subtraction ((L_value (Id i)) (Integer_literal 1))))))))
 testcases/test12.tig
 (Ok
- (LET VAR (ID a) ASSIGN (INT 0) IN FOR (ID i) ASSIGN (INT 0) TO (INT 100) DO
-  LPAREN (ID a) ASSIGN (ID a) PLUS (INT 1) SEMICOLON LPAREN RPAREN RPAREN END
-  EOF))
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((For
+     (i (Integer_literal 0) (Integer_literal 100)
+      (Sequence
+       ((Assignment
+         ((Id a) (Addition ((L_value (Id a)) (Integer_literal 1)))))
+        No_value))))))))
 testcases/test13.tig
-(Ok ((INT 3) GT (STRING df) EOF))
+(Ok (Gt ((Integer_literal 3) (String_literal df))))
 testcases/test14.tig
 (Ok
- (LET TYPE (ID arrtype) EQ ARRAY OF (ID int) TYPE (ID rectype) EQ LBRACE
-  (ID name) COLON (ID string) COMMA (ID id) COLON (ID int) RBRACE VAR
-  (ID rec) ASSIGN (ID rectype) LBRACE (ID name) EQ (STRING aname) COMMA
-  (ID id) EQ (INT 0) RBRACE VAR (ID arr) ASSIGN (ID arrtype) LBRACK (INT 3)
-  RBRACK OF (INT 0) IN IF (ID rec) NEQ (ID arr) THEN (INT 3) ELSE (INT 4) END
-  EOF))
+ (Let
+  (((Type_dec ((name arrtype) (type_ (Array int))))
+    (Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal aname)) (id (Integer_literal 0))))))))
+    (Var_dec
+     ((var_name arr) (var_type_annotation ())
+      (var_content (Array (arrtype (Integer_literal 3) (Integer_literal 0)))))))
+   ((If_then_else
+     ((Neq ((L_value (Id rec)) (L_value (Id arr)))) (Integer_literal 3)
+      (Integer_literal 4)))))))
 testcases/test15.tig
-(Ok (IF (INT 20) THEN (INT 3) EOF))
+(Ok (If_then ((Integer_literal 20) (Integer_literal 3))))
 testcases/test16.tig
 (Ok
- (LET TYPE (ID a) EQ (ID c) TYPE (ID b) EQ (ID a) TYPE (ID c) EQ (ID d) TYPE
-  (ID d) EQ (ID a) IN (STRING "") END EOF))
+ (Let
+  (((Type_dec ((name a) (type_ (Id c)))) (Type_dec ((name b) (type_ (Id a))))
+    (Type_dec ((name c) (type_ (Id d))))
+    (Type_dec ((name d) (type_ (Id a)))))
+   ((String_literal "")))))
 testcases/test17.tig
 (Ok
- (LET TYPE (ID tree) EQ LBRACE (ID key) COLON (ID int) COMMA (ID children)
-  COLON (ID treelist) RBRACE VAR (ID d) COLON (ID int) ASSIGN (INT 0) TYPE
-  (ID treelist) EQ LBRACE (ID hd) COLON (ID tree) COMMA (ID tl) COLON
-  (ID treelist) RBRACE IN (ID d) END EOF))
+ (Let
+  (((Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
+    (Var_dec
+     ((var_name d) (var_type_annotation (int))
+      (var_content (Integer_literal 0))))
+    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist)))))))
+   ((L_value (Id d))))))
 testcases/test18.tig
 (Ok
- (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
-  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
-  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN VAR (ID d) ASSIGN
-  (INT 0) FUNCTION (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON
-  (ID string) EQ LPAREN (ID do_nothing1) LPAREN (ID d) COMMA (STRING str)
-  RPAREN SEMICOLON (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0)
-  COMMA (STRING str2) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id d)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
 testcases/test19.tig
 (Ok
- (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
-  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
-  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN FUNCTION
-  (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON (ID string) EQ
-  LPAREN (ID do_nothing1) LPAREN (ID a) COMMA (STRING str) RPAREN SEMICOLON
-  (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2)
-  RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id a)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
 testcases/test2.tig
 (Ok
- (LET TYPE (ID myint) EQ (ID int) TYPE (ID arrtype) EQ ARRAY OF (ID myint)
-  VAR (ID arr1) COLON (ID arrtype) ASSIGN (ID arrtype) LBRACK (INT 10) RBRACK
-  OF (INT 0) IN (ID arr1) END EOF))
+ (Let
+  (((Type_dec ((name myint) (type_ (Id int))))
+    (Type_dec ((name arrtype) (type_ (Array myint))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype))
+      (var_content
+       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
 testcases/test20.tig
 (Ok
- (WHILE (INT 10) GT (INT 5) DO LPAREN (ID i) PLUS (INT 1) SEMICOLON LPAREN
-  RPAREN RPAREN EOF))
+ (While
+  ((Gt ((Integer_literal 10) (Integer_literal 5)))
+   (Sequence ((Addition ((L_value (Id i)) (Integer_literal 1))) No_value)))))
 testcases/test21.tig
 (Ok
- (LET FUNCTION (ID nfactor) LPAREN (ID n) COLON (ID int) RPAREN EQ IF 
-  (ID n) EQ (INT 0) THEN (INT 1) ELSE (ID n) TIMES (ID nfactor) LPAREN 
-  (ID n) MINUS (INT 1) RPAREN IN (ID nfactor) LPAREN (INT 10) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name nfactor) (arguments ((n int))) (func_type_annotation ())
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
+         (Multiplication
+          ((L_value (Id n))
+           (Function_call
+            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
+   ((Function_call (nfactor ((Integer_literal 10))))))))
 testcases/test22.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID rec1) ASSIGN (ID rectype) LBRACE (ID name) EQ
-  (STRING Name) COMMA (ID id) EQ (INT 0) RBRACE IN (ID rec1) DOT (ID nam)
-  ASSIGN (STRING asd) END EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal Name)) (id (Integer_literal 0)))))))))
+   ((Assignment ((Record_access ((Id rec1) nam)) (String_literal asd)))))))
 testcases/test23.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID rec1) ASSIGN (ID rectype) LBRACE (ID name) EQ
-  (STRING aname) COMMA (ID id) EQ (INT 0) RBRACE IN (ID rec1) DOT (ID name)
-  ASSIGN (INT 3) SEMICOLON (ID rec1) DOT (ID id) ASSIGN (STRING "") END EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal aname)) (id (Integer_literal 0)))))))))
+   ((Assignment ((Record_access ((Id rec1) name)) (Integer_literal 3)))
+    (Assignment ((Record_access ((Id rec1) id)) (String_literal "")))))))
 testcases/test24.tig
-(Ok (LET VAR (ID d) ASSIGN (INT 0) IN (ID d) LBRACK (INT 3) RBRACK END EOF))
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((L_value (Array_access ((Id d) (Integer_literal 3))))))))
 testcases/test25.tig
-(Ok (LET VAR (ID d) ASSIGN (INT 0) IN (ID d) DOT (ID f) END EOF))
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((L_value (Record_access ((Id d) f)))))))
 testcases/test26.tig
-(Ok ((INT 3) PLUS (STRING var) EOF))
+(Ok (Addition ((Integer_literal 3) (String_literal var))))
 testcases/test27.tig
 (Ok
- (LET VAR (ID a) ASSIGN (INT 0) FUNCTION (ID g) LPAREN (ID a) COLON (ID int)
-  RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (INT 2) RPAREN END EOF))
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Function_call (g ((Integer_literal 2))))))))
 testcases/test28.tig
 (Ok
- (LET TYPE (ID rectype1) EQ LBRACE (ID name) COLON (ID string) COMMA 
-  (ID id) COLON (ID int) RBRACE TYPE (ID rectype2) EQ LBRACE (ID name) COLON
-  (ID string) COMMA (ID id) COLON (ID int) RBRACE VAR (ID rec1) COLON
-  (ID rectype1) ASSIGN (ID rectype2) LBRACE (ID name) EQ (STRING Name) COMMA
-  (ID id) EQ (INT 0) RBRACE IN (ID rec1) END EOF))
+ (Let
+  (((Type_dec ((name rectype1) (type_ (Record ((name string) (id int))))))
+    (Type_dec ((name rectype2) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation (rectype1))
+      (var_content
+       (Record
+        (rectype2 ((name (String_literal Name)) (id (Integer_literal 0)))))))))
+   ((L_value (Id rec1))))))
 testcases/test29.tig
 (Ok
- (LET TYPE (ID arrtype1) EQ ARRAY OF (ID int) TYPE (ID arrtype2) EQ ARRAY OF
-  (ID int) VAR (ID arr1) COLON (ID arrtype1) ASSIGN (ID arrtype2) LBRACK
-  (INT 10) RBRACK OF (INT 0) IN (ID arr1) END EOF))
+ (Let
+  (((Type_dec ((name arrtype1) (type_ (Array int))))
+    (Type_dec ((name arrtype2) (type_ (Array int))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype1))
+      (var_content
+       (Array (arrtype2 (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
 testcases/test3.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID age)
-  COLON (ID int) RBRACE VAR (ID rec1) COLON (ID rectype) ASSIGN (ID rectype)
-  LBRACE (ID name) EQ (STRING Nobody) COMMA (ID age) EQ (INT 1000) RBRACE IN
-  (ID rec1) DOT (ID name) ASSIGN (STRING Somebody) SEMICOLON (ID rec1) END
-  EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (age int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation (rectype))
+      (var_content
+       (Record
+        (rectype
+         ((name (String_literal Nobody)) (age (Integer_literal 1000)))))))))
+   ((Assignment ((Record_access ((Id rec1) name)) (String_literal Somebody)))
+    (L_value (Id rec1))))))
 testcases/test30.tig
 (Ok
- (LET TYPE (ID a) EQ ARRAY OF (ID int) TYPE (ID b) EQ (ID a) VAR (ID arr1)
-  COLON (ID a) ASSIGN (ID b) LBRACK (INT 10) RBRACK OF (INT 0) IN (ID arr1)
-  LBRACK (INT 2) RBRACK END EOF))
+ (Let
+  (((Type_dec ((name a) (type_ (Array int))))
+    (Type_dec ((name b) (type_ (Id a))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (a))
+      (var_content (Array (b (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Array_access ((Id arr1) (Integer_literal 2))))))))
 testcases/test31.tig
-(Ok (LET VAR (ID a) COLON (ID int) ASSIGN (STRING " ") IN (ID a) END EOF))
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation (int))
+      (var_content (String_literal " ")))))
+   ((L_value (Id a))))))
 testcases/test32.tig
 (Ok
- (LET TYPE (ID arrayty) EQ ARRAY OF (ID int) VAR (ID a) ASSIGN (ID arrayty)
-  LBRACK (INT 10) RBRACK OF (STRING " ") IN (INT 0) END EOF))
+ (Let
+  (((Type_dec ((name arrayty) (type_ (Array int))))
+    (Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content
+       (Array (arrayty (Integer_literal 10) (String_literal " ")))))))
+   ((Integer_literal 0)))))
 testcases/test33.tig
-(Ok (LET VAR (ID a) ASSIGN (ID rectype) LBRACE RBRACE IN (INT 0) END EOF))
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Record (rectype ()))))))
+   ((Integer_literal 0)))))
 testcases/test34.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
-  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (STRING one)
-  COMMA (STRING two) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call (g ((String_literal one) (String_literal two))))))))
 testcases/test35.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
-  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (STRING one)
-  RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call (g ((String_literal one))))))))
 testcases/test36.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) COMMA (ID b) COLON
-  (ID string) RPAREN COLON (ID int) EQ (ID a) IN (ID g) LPAREN (INT 3) COMMA
-  (STRING one) COMMA (INT 5) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call
+     (g ((Integer_literal 3) (String_literal one) (Integer_literal 5))))))))
 testcases/test37.tig
 (Ok
- (LET VAR (ID a) ASSIGN (INT 0) VAR (ID a) ASSIGN (STRING " ") IN (INT 0) END
-  EOF))
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (String_literal " ")))))
+   ((Integer_literal 0)))))
 testcases/test38.tig
 (Ok
- (LET TYPE (ID a) EQ (ID int) TYPE (ID a) EQ (ID string) IN (INT 0) END EOF))
+ (Let
+  (((Type_dec ((name a) (type_ (Id int))))
+    (Type_dec ((name a) (type_ (Id string)))))
+   ((Integer_literal 0)))))
 testcases/test39.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int) EQ
-  (ID a) FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int)
-  EQ (ID a) IN (INT 0) END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a)))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Integer_literal 0)))))
 testcases/test4.tig
 (Ok
- (LET FUNCTION (ID nfactor) LPAREN (ID n) COLON (ID int) RPAREN COLON
-  (ID int) EQ IF (ID n) EQ (INT 0) THEN (INT 1) ELSE (ID n) TIMES
-  (ID nfactor) LPAREN (ID n) MINUS (INT 1) RPAREN IN (ID nfactor) LPAREN
-  (INT 10) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name nfactor) (arguments ((n int))) (func_type_annotation (int))
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
+         (Multiplication
+          ((L_value (Id n))
+           (Function_call
+            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
+   ((Function_call (nfactor ((Integer_literal 10))))))))
 testcases/test40.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN EQ (ID a) IN 
-  (ID g) LPAREN (INT 2) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation ())
+      (func_content (L_value (Id a))))))
+   ((Function_call (g ((Integer_literal 2))))))))
 testcases/test41.tig
 (Ok
- (LET TYPE (ID a) EQ (ID int) IN LET TYPE (ID a) EQ (ID string) IN (INT 0)
-  END END EOF))
+ (Let
+  (((Type_dec ((name a) (type_ (Id int)))))
+   ((Let (((Type_dec ((name a) (type_ (Id string))))) ((Integer_literal 0))))))))
 testcases/test42.tig
 (Ok
- (LET TYPE (ID arrtype1) EQ ARRAY OF (ID int) TYPE (ID rectype1) EQ LBRACE
-  (ID name) COLON (ID string) COMMA (ID address) COLON (ID string) COMMA
-  (ID id) COLON (ID int) COMMA (ID age) COLON (ID int) RBRACE TYPE
-  (ID arrtype2) EQ ARRAY OF (ID rectype1) TYPE (ID rectype2) EQ LBRACE
-  (ID name) COLON (ID string) COMMA (ID dates) COLON (ID arrtype1) RBRACE
-  TYPE (ID arrtype3) EQ ARRAY OF (ID string) VAR (ID arr1) ASSIGN
-  (ID arrtype1) LBRACK (INT 10) RBRACK OF (INT 0) VAR (ID arr2) ASSIGN
-  (ID arrtype2) LBRACK (INT 5) RBRACK OF (ID rectype1) LBRACE (ID name) EQ
-  (STRING aname) COMMA (ID address) EQ (STRING somewhere) COMMA (ID id) EQ
-  (INT 0) COMMA (ID age) EQ (INT 0) RBRACE VAR (ID arr3) COLON (ID arrtype3)
-  ASSIGN (ID arrtype3) LBRACK (INT 100) RBRACK OF (STRING "") VAR (ID rec1)
-  ASSIGN (ID rectype1) LBRACE (ID name) EQ (STRING Kapoios) COMMA
-  (ID address) EQ (STRING Kapou) COMMA (ID id) EQ (INT 0) (INT 2432) COMMA
-  (ID age) EQ (INT 44) RBRACE VAR (ID rec2) ASSIGN (ID rectype2) LBRACE
-  (ID name) EQ (STRING Allos) COMMA (ID dates) EQ (ID arrtype1) LBRACK
-  (INT 3) RBRACK OF (INT 1900) RBRACE IN (ID arr1) LBRACK (INT 0) RBRACK
-  ASSIGN (INT 1) SEMICOLON (ID arr1) LBRACK (INT 9) RBRACK ASSIGN (INT 3)
-  SEMICOLON (ID arr2) LBRACK (INT 3) RBRACK DOT (ID name) ASSIGN
-  (STRING kati) SEMICOLON (ID arr2) LBRACK (INT 1) RBRACK DOT (ID age) ASSIGN
-  (INT 23) SEMICOLON (ID arr3) LBRACK (INT 34) RBRACK ASSIGN (STRING sfd)
-  SEMICOLON (ID rec1) DOT (ID name) ASSIGN (STRING sdf) SEMICOLON (ID rec2)
-  DOT (ID dates) LBRACK (INT 0) RBRACK ASSIGN (INT 2323) SEMICOLON (ID rec2)
-  DOT (ID dates) LBRACK (INT 2) RBRACK ASSIGN (INT 2323) END EOF))
+ (Let
+  (((Type_dec ((name arrtype1) (type_ (Array int))))
+    (Type_dec
+     ((name rectype1)
+      (type_ (Record ((name string) (address string) (id int) (age int))))))
+    (Type_dec ((name arrtype2) (type_ (Array rectype1))))
+    (Type_dec
+     ((name rectype2) (type_ (Record ((name string) (dates arrtype1))))))
+    (Type_dec ((name arrtype3) (type_ (Array string))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation ())
+      (var_content
+       (Array (arrtype1 (Integer_literal 10) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name arr2) (var_type_annotation ())
+      (var_content
+       (Array
+        (arrtype2 (Integer_literal 5)
+         (Record
+          (rectype1
+           ((name (String_literal aname))
+            (address (String_literal somewhere)) (id (Integer_literal 0))
+            (age (Integer_literal 0))))))))))
+    (Var_dec
+     ((var_name arr3) (var_type_annotation (arrtype3))
+      (var_content
+       (Array (arrtype3 (Integer_literal 100) (String_literal ""))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype1
+         ((name (String_literal Kapoios)) (address (String_literal Kapou))
+          (id (Integer_literal 2432)) (age (Integer_literal 44))))))))
+    (Var_dec
+     ((var_name rec2) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype2
+         ((name (String_literal Allos))
+          (dates
+           (Array (arrtype1 (Integer_literal 3) (Integer_literal 1900)))))))))))
+   ((Assignment
+     ((Array_access ((Id arr1) (Integer_literal 0))) (Integer_literal 1)))
+    (Assignment
+     ((Array_access ((Id arr1) (Integer_literal 9))) (Integer_literal 3)))
+    (Assignment
+     ((Record_access ((Array_access ((Id arr2) (Integer_literal 3))) name))
+      (String_literal kati)))
+    (Assignment
+     ((Record_access ((Array_access ((Id arr2) (Integer_literal 1))) age))
+      (Integer_literal 23)))
+    (Assignment
+     ((Array_access ((Id arr3) (Integer_literal 34))) (String_literal sfd)))
+    (Assignment ((Record_access ((Id rec1) name)) (String_literal sdf)))
+    (Assignment
+     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 0)))
+      (Integer_literal 2323)))
+    (Assignment
+     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 2)))
+      (Integer_literal 2323)))))))
 testcases/test43.tig
-(Ok (LET VAR (ID a) ASSIGN LPAREN RPAREN IN (ID a) PLUS (INT 3) END EOF))
+(Ok
+ (Let
+  (((Var_dec ((var_name a) (var_type_annotation ()) (var_content No_value))))
+   ((Addition ((L_value (Id a)) (Integer_literal 3)))))))
 testcases/test44.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID b) COLON (ID rectype) ASSIGN NIL IN (ID b)
-  ASSIGN NIL END EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
+   ((Assignment ((Id b) Nil))))))
 testcases/test45.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID a) ASSIGN NIL IN (ID a) END EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec ((var_name a) (var_type_annotation ()) (var_content Nil))))
+   ((L_value (Id a))))))
 testcases/test46.tig
 (Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID b) COLON (ID rectype) ASSIGN NIL IN (ID b) EQ
-  NIL SEMICOLON (ID b) NEQ NIL END EOF))
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
+   ((Eq ((L_value (Id b)) Nil)) (Neq ((L_value (Id b)) Nil))))))
 testcases/test47.tig
 (Ok
- (LET TYPE (ID a) EQ (ID int) VAR (ID b) ASSIGN (INT 4) TYPE (ID a) EQ
-  (ID string) IN (INT 0) END EOF))
+ (Let
+  (((Type_dec ((name a) (type_ (Id int))))
+    (Var_dec
+     ((var_name b) (var_type_annotation ())
+      (var_content (Integer_literal 4))))
+    (Type_dec ((name a) (type_ (Id string)))))
+   ((Integer_literal 0)))))
 testcases/test48.tig
 (Ok
- (LET FUNCTION (ID g) LPAREN (ID a) COLON (ID int) RPAREN COLON (ID int) EQ
-  (ID a) TYPE (ID t) EQ (ID int) FUNCTION (ID g) LPAREN (ID a) COLON 
-  (ID int) RPAREN COLON (ID int) EQ (ID a) IN (INT 0) END EOF))
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a)))))
+    (Type_dec ((name t) (type_ (Id int))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Integer_literal 0)))))
 testcases/test49.tig
-(Ok
- (LET TYPE (ID rectype) EQ LBRACE (ID name) COLON (ID string) COMMA (ID id)
-  COLON (ID int) RBRACE VAR (ID a) ASSIGN (ID rectype) NIL IN (ID a) END EOF))
+(Error " (line 5 column 21): syntax error")
 testcases/test5.tig
 (Ok
- (LET TYPE (ID intlist) EQ LBRACE (ID hd) COLON (ID int) COMMA (ID tl) COLON
-  (ID intlist) RBRACE TYPE (ID tree) EQ LBRACE (ID key) COLON (ID int) COMMA
-  (ID children) COLON (ID treelist) RBRACE TYPE (ID treelist) EQ LBRACE
-  (ID hd) COLON (ID tree) COMMA (ID tl) COLON (ID treelist) RBRACE VAR
-  (ID lis) COLON (ID intlist) ASSIGN (ID intlist) LBRACE (ID hd) EQ (INT 0)
-  COMMA (ID tl) EQ NIL RBRACE IN (ID lis) END EOF))
+ (Let
+  (((Type_dec ((name intlist) (type_ (Record ((hd int) (tl intlist))))))
+    (Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
+    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist))))))
+    (Var_dec
+     ((var_name lis) (var_type_annotation (intlist))
+      (var_content (Record (intlist ((hd (Integer_literal 0)) (tl Nil))))))))
+   ((L_value (Id lis))))))
 testcases/test6.tig
 (Ok
- (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
-  COLON (ID string) RPAREN EQ (ID do_nothing2) LPAREN (ID a) PLUS (INT 1)
-  RPAREN FUNCTION (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN EQ
-  (ID do_nothing1) LPAREN (ID d) COMMA (STRING str) RPAREN IN
-  (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2) RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation ())
+      (func_content
+       (Function_call
+        (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1)))))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int))) (func_type_annotation ())
+      (func_content
+       (Function_call (do_nothing1 ((L_value (Id d)) (String_literal str))))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
 testcases/test7.tig
 (Ok
- (LET FUNCTION (ID do_nothing1) LPAREN (ID a) COLON (ID int) COMMA (ID b)
-  COLON (ID string) RPAREN COLON (ID int) EQ LPAREN (ID do_nothing2) LPAREN
-  (ID a) PLUS (INT 1) RPAREN SEMICOLON (INT 0) RPAREN FUNCTION
-  (ID do_nothing2) LPAREN (ID d) COLON (ID int) RPAREN COLON (ID string) EQ
-  LPAREN (ID do_nothing1) LPAREN (ID d) COMMA (STRING str) RPAREN SEMICOLON
-  (STRING " ") RPAREN IN (ID do_nothing1) LPAREN (INT 0) COMMA (STRING str2)
-  RPAREN END EOF))
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id d)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
 testcases/test8.tig
-(Ok (IF LPAREN (INT 10) GT (INT 20) RPAREN THEN (INT 30) ELSE (INT 40) EOF))
+(Ok
+ (If_then_else
+  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 20))))
+   (Integer_literal 30) (Integer_literal 40))))
 testcases/test9.tig
 (Ok
- (IF LPAREN (INT 5) GT (INT 4) RPAREN THEN (INT 13) ELSE (STRING " ") EOF))
+ (If_then_else
+  ((Parentheses (Gt ((Integer_literal 5) (Integer_literal 4))))
+   (Integer_literal 13) (String_literal " "))))
