@@ -11,7 +11,7 @@ let create_error_string (lexbuf : Lexing.lexbuf) error_message =
 ;;
 
 let attempt_parse (lexbuf : Lexing.lexbuf) =
-  Result.try_with (fun () -> Parser.exp Lexer.read lexbuf)
+  Result.try_with (fun () -> Parser.program Lexer.read lexbuf)
   |> Result.map_error ~f:(function
       | Lexer.SyntaxError msg ->
         create_error_string lexbuf msg
@@ -33,7 +33,7 @@ let run_parser_param =
   let%map_open filename = anon ("filename" %: file) in
   fun () ->
     run_parser ~filename
-    >>| printf !"%{sexp:(Tiger.exp, string) Result.t}"
+    >>| printf !"%{sexp:(Tiger.exp, string) Result.t}\n"
 ;;
 
 let () =

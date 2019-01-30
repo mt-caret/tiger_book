@@ -42,6 +42,7 @@ type exp =
   | Or of (exp * exp)
   | And of (exp * exp)
   | Record of (Type_id.t * (Id.t * exp) list)
+  | Array of (Type_id.t * exp * exp)
   | Assignment of (l_value * exp)
   | If_then_else of (exp * exp * exp)
   | If_then of (exp * exp)
