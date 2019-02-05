@@ -1,0 +1,755 @@
+testcases/merge.tig
+(Ok
+ (Let
+  (((Type_dec ((name any) (type_ (Record ((any int))))))
+    (Var_dec
+     ((var_name buffer) (var_type_annotation ())
+      (var_content (Function_call (getchar ())))))
+    (Func_dec
+     ((func_name readint) (arguments ((any any)))
+      (func_type_annotation (int))
+      (func_content
+       (Let
+        (((Var_dec
+           ((var_name i) (var_type_annotation ())
+            (var_content (Integer_literal 0))))
+          (Func_dec
+           ((func_name isdigit) (arguments ((s string)))
+            (func_type_annotation (int))
+            (func_content
+             (And
+              ((Ge
+                ((Function_call (ord ((L_value (Id buffer)))))
+                 (Function_call (ord ((String_literal 0))))))
+               (Le
+                ((Function_call (ord ((L_value (Id buffer)))))
+                 (Function_call (ord ((String_literal 9)))))))))))
+          (Func_dec
+           ((func_name skipto) (arguments ()) (func_type_annotation ())
+            (func_content
+             (While
+              ((Or
+                ((Eq ((L_value (Id buffer)) (String_literal " ")))
+                 (Eq ((L_value (Id buffer)) (String_literal "\n")))))
+               (Assignment ((Id buffer) (Function_call (getchar ()))))))))))
+         ((Function_call (skipto ()))
+          (Assignment
+           ((Record_access ((Id any) any))
+            (Function_call (isdigit ((L_value (Id buffer)))))))
+          (While
+           ((Function_call (isdigit ((L_value (Id buffer)))))
+            (Sequence
+             ((Assignment
+               ((Id i)
+                (Subtraction
+                 ((Addition
+                   ((Multiplication ((L_value (Id i)) (Integer_literal 10)))
+                    (Function_call (ord ((L_value (Id buffer)))))))
+                  (Function_call (ord ((String_literal 0))))))))
+              (Assignment ((Id buffer) (Function_call (getchar ()))))))))
+          (L_value (Id i))))))))
+    (Type_dec ((name list) (type_ (Record ((first int) (rest list))))))
+    (Func_dec
+     ((func_name readlist) (arguments ()) (func_type_annotation (list))
+      (func_content
+       (Let
+        (((Var_dec
+           ((var_name any) (var_type_annotation ())
+            (var_content (Record (any ((any (Integer_literal 0))))))))
+          (Var_dec
+           ((var_name i) (var_type_annotation ())
+            (var_content (Function_call (readint ((L_value (Id any)))))))))
+         ((If_then_else
+           ((L_value (Record_access ((Id any) any)))
+            (Record
+             (list
+              ((first (L_value (Id i))) (rest (Function_call (readlist ()))))))
+            Nil))))))))
+    (Func_dec
+     ((func_name merge) (arguments ((a list) (b list)))
+      (func_type_annotation (list))
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id a)) Nil)) (L_value (Id b))
+         (If_then_else
+          ((Eq ((L_value (Id b)) Nil)) (L_value (Id a))
+           (If_then_else
+            ((Lt
+              ((L_value (Record_access ((Id a) first)))
+               (L_value (Record_access ((Id b) first)))))
+             (Record
+              (list
+               ((first (L_value (Record_access ((Id a) first))))
+                (rest
+                 (Function_call
+                  (merge
+                   ((L_value (Record_access ((Id a) rest))) (L_value (Id b)))))))))
+             (Record
+              (list
+               ((first (L_value (Record_access ((Id b) first))))
+                (rest
+                 (Function_call
+                  (merge
+                   ((L_value (Id a)) (L_value (Record_access ((Id b) rest)))))))))))))))))))
+    (Func_dec
+     ((func_name printint) (arguments ((i int))) (func_type_annotation ())
+      (func_content
+       (Let
+        (((Func_dec
+           ((func_name f) (arguments ((i int))) (func_type_annotation ())
+            (func_content
+             (If_then
+              ((Gt ((L_value (Id i)) (Integer_literal 0)))
+               (Sequence
+                ((Function_call
+                  (f ((Division ((L_value (Id i)) (Integer_literal 10))))))
+                 (Function_call
+                  (print
+                   ((Function_call
+                     (chr
+                      ((Addition
+                        ((Subtraction
+                          ((L_value (Id i))
+                           (Multiplication
+                            ((Division
+                              ((L_value (Id i)) (Integer_literal 10)))
+                             (Integer_literal 10)))))
+                         (Function_call (ord ((String_literal 0))))))))))))))))))))
+         ((If_then_else
+           ((Lt ((L_value (Id i)) (Integer_literal 0)))
+            (Sequence
+             ((Function_call (print ((String_literal -))))
+              (Function_call (f ((Negation (L_value (Id i))))))))
+            (If_then_else
+             ((Gt ((L_value (Id i)) (Integer_literal 0)))
+              (Function_call (f ((L_value (Id i)))))
+              (Function_call (print ((String_literal 0))))))))))))))
+    (Func_dec
+     ((func_name printlist) (arguments ((l list))) (func_type_annotation ())
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id l)) Nil))
+         (Function_call (print ((String_literal "\n"))))
+         (Sequence
+          ((Function_call
+            (printint ((L_value (Record_access ((Id l) first))))))
+           (Function_call (print ((String_literal " "))))
+           (Function_call
+            (printlist ((L_value (Record_access ((Id l) rest)))))))))))))
+    (Var_dec
+     ((var_name list1) (var_type_annotation ())
+      (var_content (Function_call (readlist ())))))
+    (Var_dec
+     ((var_name list2) (var_type_annotation ())
+      (var_content
+       (Sequence
+        ((Assignment ((Id buffer) (Function_call (getchar ()))))
+         (Function_call (readlist ()))))))))
+   ((Function_call
+     (printlist
+      ((Function_call (merge ((L_value (Id list1)) (L_value (Id list2))))))))))))
+testcases/queens.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name N) (var_type_annotation ())
+      (var_content (Integer_literal 8))))
+    (Type_dec ((name intArray) (type_ (Array int))))
+    (Var_dec
+     ((var_name row) (var_type_annotation ())
+      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name col) (var_type_annotation ())
+      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name diag1) (var_type_annotation ())
+      (var_content
+       (Array
+        (intArray
+         (Subtraction
+          ((Addition ((L_value (Id N)) (L_value (Id N))))
+           (Integer_literal 1)))
+         (Integer_literal 0))))))
+    (Var_dec
+     ((var_name diag2) (var_type_annotation ())
+      (var_content
+       (Array
+        (intArray
+         (Subtraction
+          ((Addition ((L_value (Id N)) (L_value (Id N))))
+           (Integer_literal 1)))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name printboard) (arguments ()) (func_type_annotation ())
+      (func_content
+       (Sequence
+        ((For
+          (i (Integer_literal 0)
+           (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+           (Sequence
+            ((For
+              (j (Integer_literal 0)
+               (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+               (Function_call
+                (print
+                 ((If_then_else
+                   ((Eq
+                     ((L_value (Array_access ((Id col) (L_value (Id i)))))
+                      (L_value (Id j))))
+                    (String_literal " O") (String_literal " ."))))))))
+             (Function_call (print ((String_literal "\n"))))))))
+         (Function_call (print ((String_literal "\n")))))))))
+    (Func_dec
+     ((func_name try) (arguments ((c int))) (func_type_annotation ())
+      (func_content
+       (Parentheses
+        (If_then_else
+         ((Eq ((L_value (Id c)) (L_value (Id N))))
+          (Function_call (printboard ()))
+          (For
+           (r (Integer_literal 0)
+            (Subtraction ((L_value (Id N)) (Integer_literal 1)))
+            (If_then
+             ((And
+               ((And
+                 ((Eq
+                   ((L_value (Array_access ((Id row) (L_value (Id r)))))
+                    (Integer_literal 0)))
+                  (Eq
+                   ((L_value
+                     (Array_access
+                      ((Id diag1)
+                       (Addition ((L_value (Id r)) (L_value (Id c)))))))
+                    (Integer_literal 0)))))
+                (Eq
+                 ((L_value
+                   (Array_access
+                    ((Id diag2)
+                     (Subtraction
+                      ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                       (L_value (Id c)))))))
+                  (Integer_literal 0)))))
+              (Sequence
+               ((Assignment
+                 ((Array_access ((Id row) (L_value (Id r))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag1)
+                    (Addition ((L_value (Id r)) (L_value (Id c))))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag2)
+                    (Subtraction
+                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                      (L_value (Id c))))))
+                  (Integer_literal 1)))
+                (Assignment
+                 ((Array_access ((Id col) (L_value (Id c))))
+                  (L_value (Id r))))
+                (Function_call
+                 (try ((Addition ((L_value (Id c)) (Integer_literal 1))))))
+                (Assignment
+                 ((Array_access ((Id row) (L_value (Id r))))
+                  (Integer_literal 0)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag1)
+                    (Addition ((L_value (Id r)) (L_value (Id c))))))
+                  (Integer_literal 0)))
+                (Assignment
+                 ((Array_access
+                   ((Id diag2)
+                    (Subtraction
+                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
+                      (L_value (Id c))))))
+                  (Integer_literal 0))))))))))))))))
+   ((Function_call (try ((Integer_literal 0))))))))
+testcases/test1.tig
+(Ok
+ (Let
+  (((Type_dec ((name arrtype) (type_ (Array int))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype))
+      (var_content
+       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
+testcases/test10.tig
+(Ok
+ (While
+  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 5))))
+   (Addition ((Integer_literal 5) (Integer_literal 6))))))
+testcases/test11.tig
+(Ok
+ (For
+  (i (Integer_literal 10) (String_literal " ")
+   (Assignment ((Id i) (Subtraction ((L_value (Id i)) (Integer_literal 1))))))))
+testcases/test12.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((For
+     (i (Integer_literal 0) (Integer_literal 100)
+      (Sequence
+       ((Assignment
+         ((Id a) (Addition ((L_value (Id a)) (Integer_literal 1)))))
+        No_value))))))))
+testcases/test13.tig
+(Ok (Gt ((Integer_literal 3) (String_literal df))))
+testcases/test14.tig
+(Ok
+ (Let
+  (((Type_dec ((name arrtype) (type_ (Array int))))
+    (Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal aname)) (id (Integer_literal 0))))))))
+    (Var_dec
+     ((var_name arr) (var_type_annotation ())
+      (var_content (Array (arrtype (Integer_literal 3) (Integer_literal 0)))))))
+   ((If_then_else
+     ((Neq ((L_value (Id rec)) (L_value (Id arr)))) (Integer_literal 3)
+      (Integer_literal 4)))))))
+testcases/test15.tig
+(Ok (If_then ((Integer_literal 20) (Integer_literal 3))))
+testcases/test16.tig
+(Ok
+ (Let
+  (((Type_dec ((name a) (type_ (Id c)))) (Type_dec ((name b) (type_ (Id a))))
+    (Type_dec ((name c) (type_ (Id d))))
+    (Type_dec ((name d) (type_ (Id a)))))
+   ((String_literal "")))))
+testcases/test17.tig
+(Ok
+ (Let
+  (((Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
+    (Var_dec
+     ((var_name d) (var_type_annotation (int))
+      (var_content (Integer_literal 0))))
+    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist)))))))
+   ((L_value (Id d))))))
+testcases/test18.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id d)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+testcases/test19.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id a)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+testcases/test2.tig
+(Ok
+ (Let
+  (((Type_dec ((name myint) (type_ (Id int))))
+    (Type_dec ((name arrtype) (type_ (Array myint))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype))
+      (var_content
+       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
+testcases/test20.tig
+(Ok
+ (While
+  ((Gt ((Integer_literal 10) (Integer_literal 5)))
+   (Sequence ((Addition ((L_value (Id i)) (Integer_literal 1))) No_value)))))
+testcases/test21.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name nfactor) (arguments ((n int))) (func_type_annotation ())
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
+         (Multiplication
+          ((L_value (Id n))
+           (Function_call
+            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
+   ((Function_call (nfactor ((Integer_literal 10))))))))
+testcases/test22.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal Name)) (id (Integer_literal 0)))))))))
+   ((Assignment ((Record_access ((Id rec1) nam)) (String_literal asd)))))))
+testcases/test23.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype ((name (String_literal aname)) (id (Integer_literal 0)))))))))
+   ((Assignment ((Record_access ((Id rec1) name)) (Integer_literal 3)))
+    (Assignment ((Record_access ((Id rec1) id)) (String_literal "")))))))
+testcases/test24.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((L_value (Array_access ((Id d) (Integer_literal 3))))))))
+testcases/test25.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name d) (var_type_annotation ())
+      (var_content (Integer_literal 0)))))
+   ((L_value (Record_access ((Id d) f)))))))
+testcases/test26.tig
+(Ok (Addition ((Integer_literal 3) (String_literal var))))
+testcases/test27.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Function_call (g ((Integer_literal 2))))))))
+testcases/test28.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype1) (type_ (Record ((name string) (id int))))))
+    (Type_dec ((name rectype2) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation (rectype1))
+      (var_content
+       (Record
+        (rectype2 ((name (String_literal Name)) (id (Integer_literal 0)))))))))
+   ((L_value (Id rec1))))))
+testcases/test29.tig
+(Ok
+ (Let
+  (((Type_dec ((name arrtype1) (type_ (Array int))))
+    (Type_dec ((name arrtype2) (type_ (Array int))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (arrtype1))
+      (var_content
+       (Array (arrtype2 (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Id arr1))))))
+testcases/test3.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (age int))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation (rectype))
+      (var_content
+       (Record
+        (rectype
+         ((name (String_literal Nobody)) (age (Integer_literal 1000)))))))))
+   ((Assignment ((Record_access ((Id rec1) name)) (String_literal Somebody)))
+    (L_value (Id rec1))))))
+testcases/test30.tig
+(Ok
+ (Let
+  (((Type_dec ((name a) (type_ (Array int))))
+    (Type_dec ((name b) (type_ (Id a))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation (a))
+      (var_content (Array (b (Integer_literal 10) (Integer_literal 0)))))))
+   ((L_value (Array_access ((Id arr1) (Integer_literal 2))))))))
+testcases/test31.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation (int))
+      (var_content (String_literal " ")))))
+   ((L_value (Id a))))))
+testcases/test32.tig
+(Ok
+ (Let
+  (((Type_dec ((name arrayty) (type_ (Array int))))
+    (Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content
+       (Array (arrayty (Integer_literal 10) (String_literal " ")))))))
+   ((Integer_literal 0)))))
+testcases/test33.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Record (rectype ()))))))
+   ((Integer_literal 0)))))
+testcases/test34.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call (g ((String_literal one) (String_literal two))))))))
+testcases/test35.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call (g ((String_literal one))))))))
+testcases/test36.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int) (b string)))
+      (func_type_annotation (int)) (func_content (L_value (Id a))))))
+   ((Function_call
+     (g ((Integer_literal 3) (String_literal one) (Integer_literal 5))))))))
+testcases/test37.tig
+(Ok
+ (Let
+  (((Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (Integer_literal 0))))
+    (Var_dec
+     ((var_name a) (var_type_annotation ())
+      (var_content (String_literal " ")))))
+   ((Integer_literal 0)))))
+testcases/test38.tig
+(Ok
+ (Let
+  (((Type_dec ((name a) (type_ (Id int))))
+    (Type_dec ((name a) (type_ (Id string)))))
+   ((Integer_literal 0)))))
+testcases/test39.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a)))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Integer_literal 0)))))
+testcases/test4.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name nfactor) (arguments ((n int))) (func_type_annotation (int))
+      (func_content
+       (If_then_else
+        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
+         (Multiplication
+          ((L_value (Id n))
+           (Function_call
+            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
+   ((Function_call (nfactor ((Integer_literal 10))))))))
+testcases/test40.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation ())
+      (func_content (L_value (Id a))))))
+   ((Function_call (g ((Integer_literal 2))))))))
+testcases/test41.tig
+(Ok
+ (Let
+  (((Type_dec ((name a) (type_ (Id int)))))
+   ((Let (((Type_dec ((name a) (type_ (Id string))))) ((Integer_literal 0))))))))
+testcases/test42.tig
+(Ok
+ (Let
+  (((Type_dec ((name arrtype1) (type_ (Array int))))
+    (Type_dec
+     ((name rectype1)
+      (type_ (Record ((name string) (address string) (id int) (age int))))))
+    (Type_dec ((name arrtype2) (type_ (Array rectype1))))
+    (Type_dec
+     ((name rectype2) (type_ (Record ((name string) (dates arrtype1))))))
+    (Type_dec ((name arrtype3) (type_ (Array string))))
+    (Var_dec
+     ((var_name arr1) (var_type_annotation ())
+      (var_content
+       (Array (arrtype1 (Integer_literal 10) (Integer_literal 0))))))
+    (Var_dec
+     ((var_name arr2) (var_type_annotation ())
+      (var_content
+       (Array
+        (arrtype2 (Integer_literal 5)
+         (Record
+          (rectype1
+           ((name (String_literal aname))
+            (address (String_literal somewhere)) (id (Integer_literal 0))
+            (age (Integer_literal 0))))))))))
+    (Var_dec
+     ((var_name arr3) (var_type_annotation (arrtype3))
+      (var_content
+       (Array (arrtype3 (Integer_literal 100) (String_literal ""))))))
+    (Var_dec
+     ((var_name rec1) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype1
+         ((name (String_literal Kapoios)) (address (String_literal Kapou))
+          (id (Integer_literal 2432)) (age (Integer_literal 44))))))))
+    (Var_dec
+     ((var_name rec2) (var_type_annotation ())
+      (var_content
+       (Record
+        (rectype2
+         ((name (String_literal Allos))
+          (dates
+           (Array (arrtype1 (Integer_literal 3) (Integer_literal 1900)))))))))))
+   ((Assignment
+     ((Array_access ((Id arr1) (Integer_literal 0))) (Integer_literal 1)))
+    (Assignment
+     ((Array_access ((Id arr1) (Integer_literal 9))) (Integer_literal 3)))
+    (Assignment
+     ((Record_access ((Array_access ((Id arr2) (Integer_literal 3))) name))
+      (String_literal kati)))
+    (Assignment
+     ((Record_access ((Array_access ((Id arr2) (Integer_literal 1))) age))
+      (Integer_literal 23)))
+    (Assignment
+     ((Array_access ((Id arr3) (Integer_literal 34))) (String_literal sfd)))
+    (Assignment ((Record_access ((Id rec1) name)) (String_literal sdf)))
+    (Assignment
+     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 0)))
+      (Integer_literal 2323)))
+    (Assignment
+     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 2)))
+      (Integer_literal 2323)))))))
+testcases/test43.tig
+(Ok
+ (Let
+  (((Var_dec ((var_name a) (var_type_annotation ()) (var_content No_value))))
+   ((Addition ((L_value (Id a)) (Integer_literal 3)))))))
+testcases/test44.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
+   ((Assignment ((Id b) Nil))))))
+testcases/test45.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec ((var_name a) (var_type_annotation ()) (var_content Nil))))
+   ((L_value (Id a))))))
+testcases/test46.tig
+(Ok
+ (Let
+  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
+    (Var_dec
+     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
+   ((Eq ((L_value (Id b)) Nil)) (Neq ((L_value (Id b)) Nil))))))
+testcases/test47.tig
+(Ok
+ (Let
+  (((Type_dec ((name a) (type_ (Id int))))
+    (Var_dec
+     ((var_name b) (var_type_annotation ())
+      (var_content (Integer_literal 4))))
+    (Type_dec ((name a) (type_ (Id string)))))
+   ((Integer_literal 0)))))
+testcases/test48.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a)))))
+    (Type_dec ((name t) (type_ (Id int))))
+    (Func_dec
+     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
+      (func_content (L_value (Id a))))))
+   ((Integer_literal 0)))))
+testcases/test49.tig
+(Error " (line 5 column 21): syntax error")
+testcases/test5.tig
+(Ok
+ (Let
+  (((Type_dec ((name intlist) (type_ (Record ((hd int) (tl intlist))))))
+    (Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
+    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist))))))
+    (Var_dec
+     ((var_name lis) (var_type_annotation (intlist))
+      (var_content (Record (intlist ((hd (Integer_literal 0)) (tl Nil))))))))
+   ((L_value (Id lis))))))
+testcases/test6.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation ())
+      (func_content
+       (Function_call
+        (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1)))))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int))) (func_type_annotation ())
+      (func_content
+       (Function_call (do_nothing1 ((L_value (Id d)) (String_literal str))))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+testcases/test7.tig
+(Ok
+ (Let
+  (((Func_dec
+     ((func_name do_nothing1) (arguments ((a int) (b string)))
+      (func_type_annotation (int))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
+         (Integer_literal 0))))))
+    (Func_dec
+     ((func_name do_nothing2) (arguments ((d int)))
+      (func_type_annotation (string))
+      (func_content
+       (Sequence
+        ((Function_call
+          (do_nothing1 ((L_value (Id d)) (String_literal str))))
+         (String_literal " ")))))))
+   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+testcases/test8.tig
+(Ok
+ (If_then_else
+  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 20))))
+   (Integer_literal 30) (Integer_literal 40))))
+testcases/test9.tig
+(Ok
+ (If_then_else
+  ((Parentheses (Gt ((Integer_literal 5) (Integer_literal 4))))
+   (Integer_literal 13) (String_literal " "))))
