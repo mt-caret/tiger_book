@@ -45,7 +45,26 @@
 
 %{
 open Core_kernel
-open Tiger
+open Absyn
+
+let compact_decs decs =
+  List.fold
+    decs
+    ~init:[]
+    ~f:(fun accum x ->
+        match (x, accum) with
+        | (`F f, FunctionDec fs :: rem) -> FunctionDec (f :: fs) :: rem
+        | (`F f, _) -> FunctionDec [f] :: accum
+        | (`T t, TypeDec ts :: rem) -> TypeDec (t :: ts) :: rem
+        | (`T t, _) -> TypeDec [t] :: accum
+        | (`V v, _) -> v :: accum)
+  |> List.map
+      ~f:(function
+          | FunctionDec fs -> FunctionDec (List.rev fs)
+          | TypeDec ts -> TypeDec (List.rev ts)
+          | x -> x)
+  |> List.rev
+;;
 %}
 
 %left OR
@@ -54,7 +73,7 @@ open Tiger
 %left PLUS MINUS
 %left TIMES DIVIDE
 
-%start <Tiger.exp> program
+%start <Absyn.exp> program
 %%
 
 program:
@@ -62,49 +81,75 @@ program:
   ;
 
 literal:
-  | i = INT { Integer_literal i }
-  | s = STRING { String_literal s }
+  | i = INT { IntExp i }
+  | s = STRING { StringExp (s, $startpos) }
   ;
 
+field:
+  p = separated_pair(ID, EQ, exp) { (fst p, snd p, $startpos) };
+
+seqexp:
+  e = exp { (e, $startpos) };
+
 term:
-  | NIL { Nil }
-  | LPAREN; e = exp; SEMICOLON; es = separated_nonempty_list(SEMICOLON, exp); RPAREN
-    { Sequence (e :: es) }
+  | NIL { NilExp }
+  | LPAREN; e = seqexp; SEMICOLON; es = separated_nonempty_list(SEMICOLON, seqexp); RPAREN
+    { SeqExp (e :: es) }
+  | LPAREN; RPAREN { SeqExp [] }
   | l = literal { l }
-  | MINUS; e = term { Negation e }
-  | f = ID; LPAREN; args = separated_list(COMMA, exp); RPAREN
-    { Function_call (f, args) }
-  | e1 = term; OR; e2 = term { Or (e1, e2) }
-  | e1 = term; AND; e2 = term { And (e1, e2) }
-  | e1 = term; GE; e2 = term { Ge (e1, e2) }
-  | e1 = term; GT; e2 = term { Gt (e1, e2) }
-  | e1 = term; LE; e2 = term { Le (e1, e2) }
-  | e1 = term; LT; e2 = term { Lt (e1, e2) }
-  | e1 = term; NEQ; e2 = term { Neq (e1, e2) }
-  | e1 = term; EQ; e2 = term { Eq (e1, e2) }
-  | e1 = term; DIVIDE; e2 = term { Division (e1, e2) }
-  | e1 = term; TIMES; e2 = term { Multiplication (e1, e2) }
-  | e1 = term; MINUS; e2 = term { Subtraction (e1, e2) }
-  | e1 = term; PLUS; e2 = term { Addition (e1, e2) }
-  | t = ID; LBRACE; fields = separated_list(COMMA, separated_pair(ID, EQ, exp)); RBRACE
-    { Record (t, fields) }
-  | LPAREN; RPAREN { No_value }
-  | LPAREN; e = exp; RPAREN { Parentheses e }
-  | l = l_value { L_value l }
+  | MINUS; right = term
+    { OpExp { left = IntExp 0; oper = MinusOp; right; pos = $startpos } }
+  | func = ID; LPAREN; args = separated_list(COMMA, exp); RPAREN
+    { CallExp { func; args; pos = $startpos } }
+  | test = term; OR; else_ = term
+    { IfExp { test; then_ = IntExp 1; else_ = Some else_; pos = $startpos } }
+  | test = term; AND; then_ = term
+    { IfExp { test; then_; else_ = Some (IntExp 0); pos = $startpos } }
+  | left = term; GE; right = term
+    { OpExp { left; oper = GeOp; right; pos = $startpos } }
+  | left = term; GT; right = term
+    { OpExp { left; oper = GtOp; right; pos = $startpos } }
+  | left = term; LE; right = term
+    { OpExp { left; oper = LeOp; right; pos = $startpos } }
+  | left = term; LT; right = term
+    { OpExp { left; oper = LtOp; right; pos = $startpos } }
+  | left = term; NEQ; right = term
+    { OpExp { left; oper = EqOp; right; pos = $startpos } }
+  | left = term; EQ; right = term
+    { OpExp { left; oper = NeqOp; right; pos = $startpos } }
+  | left = term; DIVIDE; right = term
+    { OpExp { left; oper = DivideOp; right; pos = $startpos } }
+  | left = term; TIMES; right = term
+    { OpExp { left; oper = TimesOp; right; pos = $startpos } }
+  | left = term; MINUS; right = term
+    { OpExp { left; oper = MinusOp; right; pos = $startpos } }
+  | left = term; PLUS; right = term
+    { OpExp { left; oper = PlusOp; right; pos = $startpos } }
+  | typ = ID; LBRACE; fields = separated_list(COMMA, field); RBRACE
+    { RecordExp { fields; typ; pos = $startpos } }
+  | LPAREN; e = exp; RPAREN { e }
+  | l = l_value { VarExp l }
   ;
+
+dangling_else:
+  | { None }
+  | ELSE; else_ = exp { Some else_ }
 
 exp:
   | t = term { t }
-  | IF; e1 = exp; THEN; e2 = term; ELSE; e3 = exp { If_then_else (e1, e2, e3) }
-  | IF; e1 = exp; THEN; e2 = term; { If_then (e1, e2) }
-  | WHILE; e1 = exp; DO; e2 = exp { While (e1, e2 )}
-  | FOR; i = ID; e1 = assign; TO; e2 = exp; DO; e3 = exp
-    { For (i, e1, e2, e3) }
-  | BREAK { Break }
-  | t = ID; LBRACK; e1 = exp; RBRACK; OF e2 = exp { Array (t, e1, e2) }
-  | LET; decs = list(dec); IN; exps = separated_list(SEMICOLON, exp); END
-    { Let (decs, exps) }
-  | l = l_value; e = assign { Assignment (l, e) }
+  | IF; test = exp; THEN; then_ = term; else_ = dangling_else
+    { IfExp { test; then_; else_; pos = $startpos } }
+  | WHILE; test = exp; DO; body = exp
+    { WhileExp { test; body; pos = $startpos } }
+  | FOR; var = ID; lo = assign; TO; hi = exp; DO; body = exp
+    { ForExp { var; escape = ref true; lo; hi; body; pos = $startpos } }
+  | BREAK { BreakExp $startpos }
+  | typ = ID; LBRACK; size = exp; RBRACK; OF init = exp
+    { ArrayExp { typ; size; init; pos = $startpos } }
+  | LET; decs = list(dec); IN; exps = separated_list(SEMICOLON, seqexp); END
+    { LetExp { decs = compact_decs decs; body = SeqExp exps; pos = $startpos } }
+  | var = l_value; exp = assign
+    { AssignExp { var; exp; pos = $startpos } }
   ;
 
 assign:
@@ -114,43 +159,44 @@ l_value:
   i = ID; l = list(l_value_access)
     { List.fold
         l
-        ~init:(Id i)
+        ~init:(SimpleVar (i, $startpos))
         ~f:(fun accum ->
              function
-             | `Record i -> Record_access(accum, i)
-             | `Array e -> Array_access(accum, e))
+             | `Record (i, p) -> FieldVar (accum, i, p)
+             | `Array (e, p) -> SubscriptVar (accum, e, p))
     };
 
 l_value_access:
-  | DOT; i = ID { `Record i }
-  | LBRACK; e = exp; RBRACK { `Array e }
+  | DOT; i = ID { `Record (i, $startpos) }
+  | LBRACK; e = exp; RBRACK { `Array (e, $startpos) }
   ;
 
 dec:
-  | t = tydec { Type_dec t }
-  | v = vardec { Var_dec v }
-  | f = func_dec { Func_dec f }
+  | t = tydec { `T t }
+  | VAR; name = ID; typ = option(type_annotation); ASSIGN; init = exp
+    { `V (VarDec { name; escape = ref true; typ; init; pos = $startpos }) }
+  | f = fundec { `F f }
   ;
 
 tydec:
-  TYPE; name = ID; EQ; type_ = ty { { name; type_ } };
+  TYPE; ty_name = ID; EQ; ty = type_ { { ty_name; ty; ty_pos = $startpos } };
 
-ty:
-  | LBRACE; t = tyfields; RBRACE { Type.Record t }
-  | ARRAY; OF; t = ID { Type.Array t }
-  | t = ID { Type.Id t }
+type_:
+  | LBRACE; t = tyfields; RBRACE { RecordTy t }
+  | ARRAY; OF; t = ID { ArrayTy (t, $startpos) }
+  | t = ID { NameTy (t, $startpos) }
   ;
 
+tyfield:
+  t = separated_pair(ID, COLON, ID)
+    { { name = fst t; escape = ref true; typ = snd t; pos = $startpos }}
+
 tyfields:
-  t = separated_list(COMMA, separated_pair(ID, COLON, ID)) { t };
+  t = separated_list(COMMA, tyfield) { t };
 
 type_annotation:
-  COLON; type_ = ID; { type_ }
+  COLON; type_ = ID; { (type_, $startpos) }
 
-vardec:
-  VAR; var_name = ID; var_type_annotation = option(type_annotation); ASSIGN; var_content = exp
-    { { var_name; var_type_annotation; var_content } };
-
-func_dec:
-  FUNCTION; func_name = ID; LPAREN; arguments = tyfields; RPAREN; func_type_annotation = option(type_annotation); EQ; func_content = exp
-    { { func_name; arguments; func_type_annotation; func_content; } }
+fundec:
+  FUNCTION; fun_name = ID; LPAREN; params = tyfields; RPAREN; result = option(type_annotation); EQ; body = exp
+    { { fun_name; params; result; body; fun_pos = $startpos } }

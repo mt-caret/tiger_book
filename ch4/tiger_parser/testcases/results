@@ -1,755 +1,1456 @@
 testcases/merge.tig
 (Ok
- (Let
-  (((Type_dec ((name any) (type_ (Record ((any int))))))
-    (Var_dec
-     ((var_name buffer) (var_type_annotation ())
-      (var_content (Function_call (getchar ())))))
-    (Func_dec
-     ((func_name readint) (arguments ((any any)))
-      (func_type_annotation (int))
-      (func_content
-       (Let
-        (((Var_dec
-           ((var_name i) (var_type_annotation ())
-            (var_content (Integer_literal 0))))
-          (Func_dec
-           ((func_name isdigit) (arguments ((s string)))
-            (func_type_annotation (int))
-            (func_content
-             (And
-              ((Ge
-                ((Function_call (ord ((L_value (Id buffer)))))
-                 (Function_call (ord ((String_literal 0))))))
-               (Le
-                ((Function_call (ord ((L_value (Id buffer)))))
-                 (Function_call (ord ((String_literal 9)))))))))))
-          (Func_dec
-           ((func_name skipto) (arguments ()) (func_type_annotation ())
-            (func_content
-             (While
-              ((Or
-                ((Eq ((L_value (Id buffer)) (String_literal " ")))
-                 (Eq ((L_value (Id buffer)) (String_literal "\n")))))
-               (Assignment ((Id buffer) (Function_call (getchar ()))))))))))
-         ((Function_call (skipto ()))
-          (Assignment
-           ((Record_access ((Id any) any))
-            (Function_call (isdigit ((L_value (Id buffer)))))))
-          (While
-           ((Function_call (isdigit ((L_value (Id buffer)))))
-            (Sequence
-             ((Assignment
-               ((Id i)
-                (Subtraction
-                 ((Addition
-                   ((Multiplication ((L_value (Id i)) (Integer_literal 10)))
-                    (Function_call (ord ((L_value (Id buffer)))))))
-                  (Function_call (ord ((String_literal 0))))))))
-              (Assignment ((Id buffer) (Function_call (getchar ()))))))))
-          (L_value (Id i))))))))
-    (Type_dec ((name list) (type_ (Record ((first int) (rest list))))))
-    (Func_dec
-     ((func_name readlist) (arguments ()) (func_type_annotation (list))
-      (func_content
-       (Let
-        (((Var_dec
-           ((var_name any) (var_type_annotation ())
-            (var_content (Record (any ((any (Integer_literal 0))))))))
-          (Var_dec
-           ((var_name i) (var_type_annotation ())
-            (var_content (Function_call (readint ((L_value (Id any)))))))))
-         ((If_then_else
-           ((L_value (Record_access ((Id any) any)))
-            (Record
-             (list
-              ((first (L_value (Id i))) (rest (Function_call (readlist ()))))))
-            Nil))))))))
-    (Func_dec
-     ((func_name merge) (arguments ((a list) (b list)))
-      (func_type_annotation (list))
-      (func_content
-       (If_then_else
-        ((Eq ((L_value (Id a)) Nil)) (L_value (Id b))
-         (If_then_else
-          ((Eq ((L_value (Id b)) Nil)) (L_value (Id a))
-           (If_then_else
-            ((Lt
-              ((L_value (Record_access ((Id a) first)))
-               (L_value (Record_access ((Id b) first)))))
-             (Record
-              (list
-               ((first (L_value (Record_access ((Id a) first))))
-                (rest
-                 (Function_call
-                  (merge
-                   ((L_value (Record_access ((Id a) rest))) (L_value (Id b)))))))))
-             (Record
-              (list
-               ((first (L_value (Record_access ((Id b) first))))
-                (rest
-                 (Function_call
-                  (merge
-                   ((L_value (Id a)) (L_value (Record_access ((Id b) rest)))))))))))))))))))
-    (Func_dec
-     ((func_name printint) (arguments ((i int))) (func_type_annotation ())
-      (func_content
-       (Let
-        (((Func_dec
-           ((func_name f) (arguments ((i int))) (func_type_annotation ())
-            (func_content
-             (If_then
-              ((Gt ((L_value (Id i)) (Integer_literal 0)))
-               (Sequence
-                ((Function_call
-                  (f ((Division ((L_value (Id i)) (Integer_literal 10))))))
-                 (Function_call
-                  (print
-                   ((Function_call
-                     (chr
-                      ((Addition
-                        ((Subtraction
-                          ((L_value (Id i))
-                           (Multiplication
-                            ((Division
-                              ((L_value (Id i)) (Integer_literal 10)))
-                             (Integer_literal 10)))))
-                         (Function_call (ord ((String_literal 0))))))))))))))))))))
-         ((If_then_else
-           ((Lt ((L_value (Id i)) (Integer_literal 0)))
-            (Sequence
-             ((Function_call (print ((String_literal -))))
-              (Function_call (f ((Negation (L_value (Id i))))))))
-            (If_then_else
-             ((Gt ((L_value (Id i)) (Integer_literal 0)))
-              (Function_call (f ((L_value (Id i)))))
-              (Function_call (print ((String_literal 0))))))))))))))
-    (Func_dec
-     ((func_name printlist) (arguments ((l list))) (func_type_annotation ())
-      (func_content
-       (If_then_else
-        ((Eq ((L_value (Id l)) Nil))
-         (Function_call (print ((String_literal "\n"))))
-         (Sequence
-          ((Function_call
-            (printint ((L_value (Record_access ((Id l) first))))))
-           (Function_call (print ((String_literal " "))))
-           (Function_call
-            (printlist ((L_value (Record_access ((Id l) rest)))))))))))))
-    (Var_dec
-     ((var_name list1) (var_type_annotation ())
-      (var_content (Function_call (readlist ())))))
-    (Var_dec
-     ((var_name list2) (var_type_annotation ())
-      (var_content
-       (Sequence
-        ((Assignment ((Id buffer) (Function_call (getchar ()))))
-         (Function_call (readlist ()))))))))
-   ((Function_call
-     (printlist
-      ((Function_call (merge ((L_value (Id list1)) (L_value (Id list2))))))))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name any)
+       (ty (RecordTy (((name any) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name buffer) (escape true) (typ ())
+     (init (CallExp (func getchar) (args ()) (pos <opaque>))) (pos <opaque>))
+    (FunctionDec
+     (((fun_name readint)
+       (params (((name any) (escape true) (typ any) (pos <opaque>))))
+       (result ((int <opaque>)))
+       (body
+        (LetExp
+         (decs
+          ((VarDec (name i) (escape true) (typ ()) (init (IntExp 0))
+            (pos <opaque>))
+           (FunctionDec
+            (((fun_name isdigit)
+              (params (((name s) (escape true) (typ string) (pos <opaque>))))
+              (result ((int <opaque>)))
+              (body
+               (IfExp
+                (test
+                 (OpExp
+                  (left
+                   (CallExp (func ord)
+                    (args ((VarExp (SimpleVar buffer <opaque>))))
+                    (pos <opaque>)))
+                  (oper GeOp)
+                  (right
+                   (CallExp (func ord) (args ((StringExp 0 <opaque>)))
+                    (pos <opaque>)))
+                  (pos <opaque>)))
+                (then_
+                 (OpExp
+                  (left
+                   (CallExp (func ord)
+                    (args ((VarExp (SimpleVar buffer <opaque>))))
+                    (pos <opaque>)))
+                  (oper LeOp)
+                  (right
+                   (CallExp (func ord) (args ((StringExp 9 <opaque>)))
+                    (pos <opaque>)))
+                  (pos <opaque>)))
+                (else_ ((IntExp 0))) (pos <opaque>)))
+              (fun_pos <opaque>))
+             ((fun_name skipto) (params ()) (result ())
+              (body
+               (WhileExp
+                (test
+                 (IfExp
+                  (test
+                   (OpExp (left (VarExp (SimpleVar buffer <opaque>)))
+                    (oper NeqOp) (right (StringExp " " <opaque>))
+                    (pos <opaque>)))
+                  (then_ (IntExp 1))
+                  (else_
+                   ((OpExp (left (VarExp (SimpleVar buffer <opaque>)))
+                     (oper NeqOp) (right (StringExp "\n" <opaque>))
+                     (pos <opaque>))))
+                  (pos <opaque>)))
+                (body
+                 (AssignExp (var (SimpleVar buffer <opaque>))
+                  (exp (CallExp (func getchar) (args ()) (pos <opaque>)))
+                  (pos <opaque>)))
+                (pos <opaque>)))
+              (fun_pos <opaque>))))))
+         (body
+          (SeqExp
+           (((CallExp (func skipto) (args ()) (pos <opaque>)) <opaque>)
+            ((AssignExp
+              (var (FieldVar (SimpleVar any <opaque>) any <opaque>))
+              (exp
+               (CallExp (func isdigit)
+                (args ((VarExp (SimpleVar buffer <opaque>)))) (pos <opaque>)))
+              (pos <opaque>))
+             <opaque>)
+            ((WhileExp
+              (test
+               (CallExp (func isdigit)
+                (args ((VarExp (SimpleVar buffer <opaque>)))) (pos <opaque>)))
+              (body
+               (SeqExp
+                (((AssignExp (var (SimpleVar i <opaque>))
+                   (exp
+                    (OpExp
+                     (left
+                      (OpExp
+                       (left
+                        (OpExp (left (VarExp (SimpleVar i <opaque>)))
+                         (oper TimesOp) (right (IntExp 10)) (pos <opaque>)))
+                       (oper PlusOp)
+                       (right
+                        (CallExp (func ord)
+                         (args ((VarExp (SimpleVar buffer <opaque>))))
+                         (pos <opaque>)))
+                       (pos <opaque>)))
+                     (oper MinusOp)
+                     (right
+                      (CallExp (func ord) (args ((StringExp 0 <opaque>)))
+                       (pos <opaque>)))
+                     (pos <opaque>)))
+                   (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp (var (SimpleVar buffer <opaque>))
+                   (exp (CallExp (func getchar) (args ()) (pos <opaque>)))
+                   (pos <opaque>))
+                  <opaque>))))
+              (pos <opaque>))
+             <opaque>)
+            ((VarExp (SimpleVar i <opaque>)) <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))
+    (TypeDec
+     (((ty_name list)
+       (ty
+        (RecordTy
+         (((name first) (escape true) (typ int) (pos <opaque>))
+          ((name rest) (escape true) (typ list) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (FunctionDec
+     (((fun_name readlist) (params ()) (result ((list <opaque>)))
+       (body
+        (LetExp
+         (decs
+          ((VarDec (name any) (escape true) (typ ())
+            (init
+             (RecordExp (fields ((any (IntExp 0) <opaque>))) (typ any)
+              (pos <opaque>)))
+            (pos <opaque>))
+           (VarDec (name i) (escape true) (typ ())
+            (init
+             (CallExp (func readint)
+              (args ((VarExp (SimpleVar any <opaque>)))) (pos <opaque>)))
+            (pos <opaque>))))
+         (body
+          (SeqExp
+           (((IfExp
+              (test
+               (VarExp (FieldVar (SimpleVar any <opaque>) any <opaque>)))
+              (then_
+               (RecordExp
+                (fields
+                 ((first (VarExp (SimpleVar i <opaque>)) <opaque>)
+                  (rest (CallExp (func readlist) (args ()) (pos <opaque>))
+                   <opaque>)))
+                (typ list) (pos <opaque>)))
+              (else_ (NilExp)) (pos <opaque>))
+             <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))
+      ((fun_name merge)
+       (params
+        (((name a) (escape true) (typ list) (pos <opaque>))
+         ((name b) (escape true) (typ list) (pos <opaque>))))
+       (result ((list <opaque>)))
+       (body
+        (IfExp
+         (test
+          (OpExp (left (VarExp (SimpleVar a <opaque>))) (oper NeqOp)
+           (right NilExp) (pos <opaque>)))
+         (then_ (VarExp (SimpleVar b <opaque>)))
+         (else_
+          ((IfExp
+            (test
+             (OpExp (left (VarExp (SimpleVar b <opaque>))) (oper NeqOp)
+              (right NilExp) (pos <opaque>)))
+            (then_ (VarExp (SimpleVar a <opaque>)))
+            (else_
+             ((IfExp
+               (test
+                (OpExp
+                 (left
+                  (VarExp (FieldVar (SimpleVar a <opaque>) first <opaque>)))
+                 (oper LtOp)
+                 (right
+                  (VarExp (FieldVar (SimpleVar b <opaque>) first <opaque>)))
+                 (pos <opaque>)))
+               (then_
+                (RecordExp
+                 (fields
+                  ((first
+                    (VarExp (FieldVar (SimpleVar a <opaque>) first <opaque>))
+                    <opaque>)
+                   (rest
+                    (CallExp (func merge)
+                     (args
+                      ((VarExp
+                        (FieldVar (SimpleVar a <opaque>) rest <opaque>))
+                       (VarExp (SimpleVar b <opaque>))))
+                     (pos <opaque>))
+                    <opaque>)))
+                 (typ list) (pos <opaque>)))
+               (else_
+                ((RecordExp
+                  (fields
+                   ((first
+                     (VarExp
+                      (FieldVar (SimpleVar b <opaque>) first <opaque>))
+                     <opaque>)
+                    (rest
+                     (CallExp (func merge)
+                      (args
+                       ((VarExp (SimpleVar a <opaque>))
+                        (VarExp
+                         (FieldVar (SimpleVar b <opaque>) rest <opaque>))))
+                      (pos <opaque>))
+                     <opaque>)))
+                  (typ list) (pos <opaque>))))
+               (pos <opaque>))))
+            (pos <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))
+      ((fun_name printint)
+       (params (((name i) (escape true) (typ int) (pos <opaque>))))
+       (result ())
+       (body
+        (LetExp
+         (decs
+          ((FunctionDec
+            (((fun_name f)
+              (params (((name i) (escape true) (typ int) (pos <opaque>))))
+              (result ())
+              (body
+               (IfExp
+                (test
+                 (OpExp (left (VarExp (SimpleVar i <opaque>))) (oper GtOp)
+                  (right (IntExp 0)) (pos <opaque>)))
+                (then_
+                 (SeqExp
+                  (((CallExp (func f)
+                     (args
+                      ((OpExp (left (VarExp (SimpleVar i <opaque>)))
+                        (oper DivideOp) (right (IntExp 10)) (pos <opaque>))))
+                     (pos <opaque>))
+                    <opaque>)
+                   ((CallExp (func print)
+                     (args
+                      ((CallExp (func chr)
+                        (args
+                         ((OpExp
+                           (left
+                            (OpExp (left (VarExp (SimpleVar i <opaque>)))
+                             (oper MinusOp)
+                             (right
+                              (OpExp
+                               (left
+                                (OpExp (left (VarExp (SimpleVar i <opaque>)))
+                                 (oper DivideOp) (right (IntExp 10))
+                                 (pos <opaque>)))
+                               (oper TimesOp) (right (IntExp 10))
+                               (pos <opaque>)))
+                             (pos <opaque>)))
+                           (oper PlusOp)
+                           (right
+                            (CallExp (func ord)
+                             (args ((StringExp 0 <opaque>))) (pos <opaque>)))
+                           (pos <opaque>))))
+                        (pos <opaque>))))
+                     (pos <opaque>))
+                    <opaque>))))
+                (else_ ()) (pos <opaque>)))
+              (fun_pos <opaque>))))))
+         (body
+          (SeqExp
+           (((IfExp
+              (test
+               (OpExp (left (VarExp (SimpleVar i <opaque>))) (oper LtOp)
+                (right (IntExp 0)) (pos <opaque>)))
+              (then_
+               (SeqExp
+                (((CallExp (func print) (args ((StringExp - <opaque>)))
+                   (pos <opaque>))
+                  <opaque>)
+                 ((CallExp (func f)
+                   (args
+                    ((OpExp (left (IntExp 0)) (oper MinusOp)
+                      (right (VarExp (SimpleVar i <opaque>))) (pos <opaque>))))
+                   (pos <opaque>))
+                  <opaque>))))
+              (else_
+               ((IfExp
+                 (test
+                  (OpExp (left (VarExp (SimpleVar i <opaque>))) (oper GtOp)
+                   (right (IntExp 0)) (pos <opaque>)))
+                 (then_
+                  (CallExp (func f) (args ((VarExp (SimpleVar i <opaque>))))
+                   (pos <opaque>)))
+                 (else_
+                  ((CallExp (func print) (args ((StringExp 0 <opaque>)))
+                    (pos <opaque>))))
+                 (pos <opaque>))))
+              (pos <opaque>))
+             <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))
+      ((fun_name printlist)
+       (params (((name l) (escape true) (typ list) (pos <opaque>))))
+       (result ())
+       (body
+        (IfExp
+         (test
+          (OpExp (left (VarExp (SimpleVar l <opaque>))) (oper NeqOp)
+           (right NilExp) (pos <opaque>)))
+         (then_
+          (CallExp (func print) (args ((StringExp "\n" <opaque>)))
+           (pos <opaque>)))
+         (else_
+          ((SeqExp
+            (((CallExp (func printint)
+               (args
+                ((VarExp (FieldVar (SimpleVar l <opaque>) first <opaque>))))
+               (pos <opaque>))
+              <opaque>)
+             ((CallExp (func print) (args ((StringExp " " <opaque>)))
+               (pos <opaque>))
+              <opaque>)
+             ((CallExp (func printlist)
+               (args
+                ((VarExp (FieldVar (SimpleVar l <opaque>) rest <opaque>))))
+               (pos <opaque>))
+              <opaque>)))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))
+    (VarDec (name list1) (escape true) (typ ())
+     (init (CallExp (func readlist) (args ()) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name list2) (escape true) (typ ())
+     (init
+      (SeqExp
+       (((AssignExp (var (SimpleVar buffer <opaque>))
+          (exp (CallExp (func getchar) (args ()) (pos <opaque>)))
+          (pos <opaque>))
+         <opaque>)
+        ((CallExp (func readlist) (args ()) (pos <opaque>)) <opaque>))))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((CallExp (func printlist)
+       (args
+        ((CallExp (func merge)
+          (args
+           ((VarExp (SimpleVar list1 <opaque>))
+            (VarExp (SimpleVar list2 <opaque>))))
+          (pos <opaque>))))
+       (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/queens.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name N) (var_type_annotation ())
-      (var_content (Integer_literal 8))))
-    (Type_dec ((name intArray) (type_ (Array int))))
-    (Var_dec
-     ((var_name row) (var_type_annotation ())
-      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
-    (Var_dec
-     ((var_name col) (var_type_annotation ())
-      (var_content (Array (intArray (L_value (Id N)) (Integer_literal 0))))))
-    (Var_dec
-     ((var_name diag1) (var_type_annotation ())
-      (var_content
-       (Array
-        (intArray
-         (Subtraction
-          ((Addition ((L_value (Id N)) (L_value (Id N))))
-           (Integer_literal 1)))
-         (Integer_literal 0))))))
-    (Var_dec
-     ((var_name diag2) (var_type_annotation ())
-      (var_content
-       (Array
-        (intArray
-         (Subtraction
-          ((Addition ((L_value (Id N)) (L_value (Id N))))
-           (Integer_literal 1)))
-         (Integer_literal 0))))))
-    (Func_dec
-     ((func_name printboard) (arguments ()) (func_type_annotation ())
-      (func_content
-       (Sequence
-        ((For
-          (i (Integer_literal 0)
-           (Subtraction ((L_value (Id N)) (Integer_literal 1)))
-           (Sequence
-            ((For
-              (j (Integer_literal 0)
-               (Subtraction ((L_value (Id N)) (Integer_literal 1)))
-               (Function_call
-                (print
-                 ((If_then_else
-                   ((Eq
-                     ((L_value (Array_access ((Id col) (L_value (Id i)))))
-                      (L_value (Id j))))
-                    (String_literal " O") (String_literal " ."))))))))
-             (Function_call (print ((String_literal "\n"))))))))
-         (Function_call (print ((String_literal "\n")))))))))
-    (Func_dec
-     ((func_name try) (arguments ((c int))) (func_type_annotation ())
-      (func_content
-       (Parentheses
-        (If_then_else
-         ((Eq ((L_value (Id c)) (L_value (Id N))))
-          (Function_call (printboard ()))
-          (For
-           (r (Integer_literal 0)
-            (Subtraction ((L_value (Id N)) (Integer_literal 1)))
-            (If_then
-             ((And
-               ((And
-                 ((Eq
-                   ((L_value (Array_access ((Id row) (L_value (Id r)))))
-                    (Integer_literal 0)))
-                  (Eq
-                   ((L_value
-                     (Array_access
-                      ((Id diag1)
-                       (Addition ((L_value (Id r)) (L_value (Id c)))))))
-                    (Integer_literal 0)))))
-                (Eq
-                 ((L_value
-                   (Array_access
-                    ((Id diag2)
-                     (Subtraction
-                      ((Addition ((L_value (Id r)) (Integer_literal 7)))
-                       (L_value (Id c)))))))
-                  (Integer_literal 0)))))
-              (Sequence
-               ((Assignment
-                 ((Array_access ((Id row) (L_value (Id r))))
-                  (Integer_literal 1)))
-                (Assignment
-                 ((Array_access
-                   ((Id diag1)
-                    (Addition ((L_value (Id r)) (L_value (Id c))))))
-                  (Integer_literal 1)))
-                (Assignment
-                 ((Array_access
-                   ((Id diag2)
-                    (Subtraction
-                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
-                      (L_value (Id c))))))
-                  (Integer_literal 1)))
-                (Assignment
-                 ((Array_access ((Id col) (L_value (Id c))))
-                  (L_value (Id r))))
-                (Function_call
-                 (try ((Addition ((L_value (Id c)) (Integer_literal 1))))))
-                (Assignment
-                 ((Array_access ((Id row) (L_value (Id r))))
-                  (Integer_literal 0)))
-                (Assignment
-                 ((Array_access
-                   ((Id diag1)
-                    (Addition ((L_value (Id r)) (L_value (Id c))))))
-                  (Integer_literal 0)))
-                (Assignment
-                 ((Array_access
-                   ((Id diag2)
-                    (Subtraction
-                     ((Addition ((L_value (Id r)) (Integer_literal 7)))
-                      (L_value (Id c))))))
-                  (Integer_literal 0))))))))))))))))
-   ((Function_call (try ((Integer_literal 0))))))))
+ (LetExp
+  (decs
+   ((VarDec (name N) (escape true) (typ ()) (init (IntExp 8)) (pos <opaque>))
+    (TypeDec
+     (((ty_name intArray) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name row) (escape true) (typ ())
+     (init
+      (ArrayExp (typ intArray) (size (VarExp (SimpleVar N <opaque>)))
+       (init (IntExp 0)) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name col) (escape true) (typ ())
+     (init
+      (ArrayExp (typ intArray) (size (VarExp (SimpleVar N <opaque>)))
+       (init (IntExp 0)) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name diag1) (escape true) (typ ())
+     (init
+      (ArrayExp (typ intArray)
+       (size
+        (OpExp
+         (left
+          (OpExp (left (VarExp (SimpleVar N <opaque>))) (oper PlusOp)
+           (right (VarExp (SimpleVar N <opaque>))) (pos <opaque>)))
+         (oper MinusOp) (right (IntExp 1)) (pos <opaque>)))
+       (init (IntExp 0)) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name diag2) (escape true) (typ ())
+     (init
+      (ArrayExp (typ intArray)
+       (size
+        (OpExp
+         (left
+          (OpExp (left (VarExp (SimpleVar N <opaque>))) (oper PlusOp)
+           (right (VarExp (SimpleVar N <opaque>))) (pos <opaque>)))
+         (oper MinusOp) (right (IntExp 1)) (pos <opaque>)))
+       (init (IntExp 0)) (pos <opaque>)))
+     (pos <opaque>))
+    (FunctionDec
+     (((fun_name printboard) (params ()) (result ())
+       (body
+        (SeqExp
+         (((ForExp (var i) (escape true) (lo (IntExp 0))
+            (hi
+             (OpExp (left (VarExp (SimpleVar N <opaque>))) (oper MinusOp)
+              (right (IntExp 1)) (pos <opaque>)))
+            (body
+             (SeqExp
+              (((ForExp (var j) (escape true) (lo (IntExp 0))
+                 (hi
+                  (OpExp (left (VarExp (SimpleVar N <opaque>)))
+                   (oper MinusOp) (right (IntExp 1)) (pos <opaque>)))
+                 (body
+                  (CallExp (func print)
+                   (args
+                    ((IfExp
+                      (test
+                       (OpExp
+                        (left
+                         (VarExp
+                          (SubscriptVar (SimpleVar col <opaque>)
+                           (VarExp (SimpleVar i <opaque>)) <opaque>)))
+                        (oper NeqOp) (right (VarExp (SimpleVar j <opaque>)))
+                        (pos <opaque>)))
+                      (then_ (StringExp " O" <opaque>))
+                      (else_ ((StringExp " ." <opaque>))) (pos <opaque>))))
+                   (pos <opaque>)))
+                 (pos <opaque>))
+                <opaque>)
+               ((CallExp (func print) (args ((StringExp "\n" <opaque>)))
+                 (pos <opaque>))
+                <opaque>))))
+            (pos <opaque>))
+           <opaque>)
+          ((CallExp (func print) (args ((StringExp "\n" <opaque>)))
+            (pos <opaque>))
+           <opaque>))))
+       (fun_pos <opaque>))
+      ((fun_name try)
+       (params (((name c) (escape true) (typ int) (pos <opaque>))))
+       (result ())
+       (body
+        (IfExp
+         (test
+          (OpExp (left (VarExp (SimpleVar c <opaque>))) (oper NeqOp)
+           (right (VarExp (SimpleVar N <opaque>))) (pos <opaque>)))
+         (then_ (CallExp (func printboard) (args ()) (pos <opaque>)))
+         (else_
+          ((ForExp (var r) (escape true) (lo (IntExp 0))
+            (hi
+             (OpExp (left (VarExp (SimpleVar N <opaque>))) (oper MinusOp)
+              (right (IntExp 1)) (pos <opaque>)))
+            (body
+             (IfExp
+              (test
+               (IfExp
+                (test
+                 (IfExp
+                  (test
+                   (OpExp
+                    (left
+                     (VarExp
+                      (SubscriptVar (SimpleVar row <opaque>)
+                       (VarExp (SimpleVar r <opaque>)) <opaque>)))
+                    (oper NeqOp) (right (IntExp 0)) (pos <opaque>)))
+                  (then_
+                   (OpExp
+                    (left
+                     (VarExp
+                      (SubscriptVar (SimpleVar diag1 <opaque>)
+                       (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                        (oper PlusOp) (right (VarExp (SimpleVar c <opaque>)))
+                        (pos <opaque>))
+                       <opaque>)))
+                    (oper NeqOp) (right (IntExp 0)) (pos <opaque>)))
+                  (else_ ((IntExp 0))) (pos <opaque>)))
+                (then_
+                 (OpExp
+                  (left
+                   (VarExp
+                    (SubscriptVar (SimpleVar diag2 <opaque>)
+                     (OpExp
+                      (left
+                       (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                        (oper PlusOp) (right (IntExp 7)) (pos <opaque>)))
+                      (oper MinusOp) (right (VarExp (SimpleVar c <opaque>)))
+                      (pos <opaque>))
+                     <opaque>)))
+                  (oper NeqOp) (right (IntExp 0)) (pos <opaque>)))
+                (else_ ((IntExp 0))) (pos <opaque>)))
+              (then_
+               (SeqExp
+                (((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar row <opaque>)
+                     (VarExp (SimpleVar r <opaque>)) <opaque>))
+                   (exp (IntExp 1)) (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar diag1 <opaque>)
+                     (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                      (oper PlusOp) (right (VarExp (SimpleVar c <opaque>)))
+                      (pos <opaque>))
+                     <opaque>))
+                   (exp (IntExp 1)) (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar diag2 <opaque>)
+                     (OpExp
+                      (left
+                       (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                        (oper PlusOp) (right (IntExp 7)) (pos <opaque>)))
+                      (oper MinusOp) (right (VarExp (SimpleVar c <opaque>)))
+                      (pos <opaque>))
+                     <opaque>))
+                   (exp (IntExp 1)) (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar col <opaque>)
+                     (VarExp (SimpleVar c <opaque>)) <opaque>))
+                   (exp (VarExp (SimpleVar r <opaque>))) (pos <opaque>))
+                  <opaque>)
+                 ((CallExp (func try)
+                   (args
+                    ((OpExp (left (VarExp (SimpleVar c <opaque>)))
+                      (oper PlusOp) (right (IntExp 1)) (pos <opaque>))))
+                   (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar row <opaque>)
+                     (VarExp (SimpleVar r <opaque>)) <opaque>))
+                   (exp (IntExp 0)) (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar diag1 <opaque>)
+                     (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                      (oper PlusOp) (right (VarExp (SimpleVar c <opaque>)))
+                      (pos <opaque>))
+                     <opaque>))
+                   (exp (IntExp 0)) (pos <opaque>))
+                  <opaque>)
+                 ((AssignExp
+                   (var
+                    (SubscriptVar (SimpleVar diag2 <opaque>)
+                     (OpExp
+                      (left
+                       (OpExp (left (VarExp (SimpleVar r <opaque>)))
+                        (oper PlusOp) (right (IntExp 7)) (pos <opaque>)))
+                      (oper MinusOp) (right (VarExp (SimpleVar c <opaque>)))
+                      (pos <opaque>))
+                     <opaque>))
+                   (exp (IntExp 0)) (pos <opaque>))
+                  <opaque>))))
+              (else_ ()) (pos <opaque>)))
+            (pos <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func try) (args ((IntExp 0))) (pos <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test1.tig
 (Ok
- (Let
-  (((Type_dec ((name arrtype) (type_ (Array int))))
-    (Var_dec
-     ((var_name arr1) (var_type_annotation (arrtype))
-      (var_content
-       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
-   ((L_value (Id arr1))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name arrtype) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name arr1) (escape true) (typ ((arrtype <opaque>)))
+     (init
+      (ArrayExp (typ arrtype) (size (IntExp 10)) (init (IntExp 0))
+       (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar arr1 <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test10.tig
 (Ok
- (While
-  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 5))))
-   (Addition ((Integer_literal 5) (Integer_literal 6))))))
+ (WhileExp
+  (test
+   (OpExp (left (IntExp 10)) (oper GtOp) (right (IntExp 5)) (pos <opaque>)))
+  (body
+   (OpExp (left (IntExp 5)) (oper PlusOp) (right (IntExp 6)) (pos <opaque>)))
+  (pos <opaque>)))
 testcases/test11.tig
 (Ok
- (For
-  (i (Integer_literal 10) (String_literal " ")
-   (Assignment ((Id i) (Subtraction ((L_value (Id i)) (Integer_literal 1))))))))
+ (ForExp (var i) (escape true) (lo (IntExp 10)) (hi (StringExp " " <opaque>))
+  (body
+   (AssignExp (var (SimpleVar i <opaque>))
+    (exp
+     (OpExp (left (VarExp (SimpleVar i <opaque>))) (oper MinusOp)
+      (right (IntExp 1)) (pos <opaque>)))
+    (pos <opaque>)))
+  (pos <opaque>)))
 testcases/test12.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content (Integer_literal 0)))))
-   ((For
-     (i (Integer_literal 0) (Integer_literal 100)
-      (Sequence
-       ((Assignment
-         ((Id a) (Addition ((L_value (Id a)) (Integer_literal 1)))))
-        No_value))))))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))))
+  (body
+   (SeqExp
+    (((ForExp (var i) (escape true) (lo (IntExp 0)) (hi (IntExp 100))
+       (body
+        (SeqExp
+         (((AssignExp (var (SimpleVar a <opaque>))
+            (exp
+             (OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+              (right (IntExp 1)) (pos <opaque>)))
+            (pos <opaque>))
+           <opaque>)
+          ((SeqExp ()) <opaque>))))
+       (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test13.tig
-(Ok (Gt ((Integer_literal 3) (String_literal df))))
+(Ok
+ (OpExp (left (IntExp 3)) (oper GtOp) (right (StringExp df <opaque>))
+  (pos <opaque>)))
 testcases/test14.tig
 (Ok
- (Let
-  (((Type_dec ((name arrtype) (type_ (Array int))))
-    (Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name rec) (var_type_annotation ())
-      (var_content
-       (Record
-        (rectype ((name (String_literal aname)) (id (Integer_literal 0))))))))
-    (Var_dec
-     ((var_name arr) (var_type_annotation ())
-      (var_content (Array (arrtype (Integer_literal 3) (Integer_literal 0)))))))
-   ((If_then_else
-     ((Neq ((L_value (Id rec)) (L_value (Id arr)))) (Integer_literal 3)
-      (Integer_literal 4)))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name arrtype) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name rec) (escape true) (typ ())
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp aname <opaque>) <opaque>) (id (IntExp 0) <opaque>)))
+       (typ rectype) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name arr) (escape true) (typ ())
+     (init
+      (ArrayExp (typ arrtype) (size (IntExp 3)) (init (IntExp 0))
+       (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((IfExp
+       (test
+        (OpExp (left (VarExp (SimpleVar rec <opaque>))) (oper EqOp)
+         (right (VarExp (SimpleVar arr <opaque>))) (pos <opaque>)))
+       (then_ (IntExp 3)) (else_ ((IntExp 4))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test15.tig
-(Ok (If_then ((Integer_literal 20) (Integer_literal 3))))
+(Ok (IfExp (test (IntExp 20)) (then_ (IntExp 3)) (else_ ()) (pos <opaque>)))
 testcases/test16.tig
 (Ok
- (Let
-  (((Type_dec ((name a) (type_ (Id c)))) (Type_dec ((name b) (type_ (Id a))))
-    (Type_dec ((name c) (type_ (Id d))))
-    (Type_dec ((name d) (type_ (Id a)))))
-   ((String_literal "")))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name a) (ty (NameTy c <opaque>)) (ty_pos <opaque>))
+      ((ty_name b) (ty (NameTy a <opaque>)) (ty_pos <opaque>))
+      ((ty_name c) (ty (NameTy d <opaque>)) (ty_pos <opaque>))
+      ((ty_name d) (ty (NameTy a <opaque>)) (ty_pos <opaque>))))))
+  (body (SeqExp (((StringExp "" <opaque>) <opaque>)))) (pos <opaque>)))
 testcases/test17.tig
 (Ok
- (Let
-  (((Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
-    (Var_dec
-     ((var_name d) (var_type_annotation (int))
-      (var_content (Integer_literal 0))))
-    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist)))))))
-   ((L_value (Id d))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name tree)
+       (ty
+        (RecordTy
+         (((name key) (escape true) (typ int) (pos <opaque>))
+          ((name children) (escape true) (typ treelist) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name d) (escape true) (typ ((int <opaque>))) (init (IntExp 0))
+     (pos <opaque>))
+    (TypeDec
+     (((ty_name treelist)
+       (ty
+        (RecordTy
+         (((name hd) (escape true) (typ tree) (pos <opaque>))
+          ((name tl) (escape true) (typ treelist) (pos <opaque>)))))
+       (ty_pos <opaque>))))))
+  (body (SeqExp (((VarExp (SimpleVar d <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test18.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name do_nothing1) (arguments ((a int) (b string)))
-      (func_type_annotation (int))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
-         (Integer_literal 0))))))
-    (Var_dec
-     ((var_name d) (var_type_annotation ())
-      (var_content (Integer_literal 0))))
-    (Func_dec
-     ((func_name do_nothing2) (arguments ((d int)))
-      (func_type_annotation (string))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing1 ((L_value (Id d)) (String_literal str))))
-         (String_literal " ")))))))
-   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name do_nothing1)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing2)
+            (args
+             ((OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+               (right (IntExp 1)) (pos <opaque>))))
+            (pos <opaque>))
+           <opaque>)
+          ((IntExp 0) <opaque>))))
+       (fun_pos <opaque>))))
+    (VarDec (name d) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))
+    (FunctionDec
+     (((fun_name do_nothing2)
+       (params (((name d) (escape true) (typ int) (pos <opaque>))))
+       (result ((string <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing1)
+            (args ((VarExp (SimpleVar d <opaque>)) (StringExp str <opaque>)))
+            (pos <opaque>))
+           <opaque>)
+          ((StringExp " " <opaque>) <opaque>))))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func do_nothing1)
+       (args ((IntExp 0) (StringExp str2 <opaque>))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test19.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name do_nothing1) (arguments ((a int) (b string)))
-      (func_type_annotation (int))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
-         (Integer_literal 0))))))
-    (Func_dec
-     ((func_name do_nothing2) (arguments ((d int)))
-      (func_type_annotation (string))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing1 ((L_value (Id a)) (String_literal str))))
-         (String_literal " ")))))))
-   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name do_nothing1)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing2)
+            (args
+             ((OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+               (right (IntExp 1)) (pos <opaque>))))
+            (pos <opaque>))
+           <opaque>)
+          ((IntExp 0) <opaque>))))
+       (fun_pos <opaque>))
+      ((fun_name do_nothing2)
+       (params (((name d) (escape true) (typ int) (pos <opaque>))))
+       (result ((string <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing1)
+            (args ((VarExp (SimpleVar a <opaque>)) (StringExp str <opaque>)))
+            (pos <opaque>))
+           <opaque>)
+          ((StringExp " " <opaque>) <opaque>))))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func do_nothing1)
+       (args ((IntExp 0) (StringExp str2 <opaque>))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test2.tig
 (Ok
- (Let
-  (((Type_dec ((name myint) (type_ (Id int))))
-    (Type_dec ((name arrtype) (type_ (Array myint))))
-    (Var_dec
-     ((var_name arr1) (var_type_annotation (arrtype))
-      (var_content
-       (Array (arrtype (Integer_literal 10) (Integer_literal 0)))))))
-   ((L_value (Id arr1))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name myint) (ty (NameTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name arrtype) (ty (ArrayTy myint <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name arr1) (escape true) (typ ((arrtype <opaque>)))
+     (init
+      (ArrayExp (typ arrtype) (size (IntExp 10)) (init (IntExp 0))
+       (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar arr1 <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test20.tig
 (Ok
- (While
-  ((Gt ((Integer_literal 10) (Integer_literal 5)))
-   (Sequence ((Addition ((L_value (Id i)) (Integer_literal 1))) No_value)))))
+ (WhileExp
+  (test
+   (OpExp (left (IntExp 10)) (oper GtOp) (right (IntExp 5)) (pos <opaque>)))
+  (body
+   (SeqExp
+    (((OpExp (left (VarExp (SimpleVar i <opaque>))) (oper PlusOp)
+       (right (IntExp 1)) (pos <opaque>))
+      <opaque>)
+     ((SeqExp ()) <opaque>))))
+  (pos <opaque>)))
 testcases/test21.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name nfactor) (arguments ((n int))) (func_type_annotation ())
-      (func_content
-       (If_then_else
-        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
-         (Multiplication
-          ((L_value (Id n))
-           (Function_call
-            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
-   ((Function_call (nfactor ((Integer_literal 10))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name nfactor)
+       (params (((name n) (escape true) (typ int) (pos <opaque>))))
+       (result ())
+       (body
+        (IfExp
+         (test
+          (OpExp (left (VarExp (SimpleVar n <opaque>))) (oper NeqOp)
+           (right (IntExp 0)) (pos <opaque>)))
+         (then_ (IntExp 1))
+         (else_
+          ((OpExp (left (VarExp (SimpleVar n <opaque>))) (oper TimesOp)
+            (right
+             (CallExp (func nfactor)
+              (args
+               ((OpExp (left (VarExp (SimpleVar n <opaque>))) (oper MinusOp)
+                 (right (IntExp 1)) (pos <opaque>))))
+              (pos <opaque>)))
+            (pos <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func nfactor) (args ((IntExp 10))) (pos <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test22.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name rec1) (var_type_annotation ())
-      (var_content
-       (Record
-        (rectype ((name (String_literal Name)) (id (Integer_literal 0)))))))))
-   ((Assignment ((Record_access ((Id rec1) nam)) (String_literal asd)))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name rec1) (escape true) (typ ())
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp Name <opaque>) <opaque>) (id (IntExp 0) <opaque>)))
+       (typ rectype) (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((AssignExp (var (FieldVar (SimpleVar rec1 <opaque>) nam <opaque>))
+       (exp (StringExp asd <opaque>)) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test23.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name rec1) (var_type_annotation ())
-      (var_content
-       (Record
-        (rectype ((name (String_literal aname)) (id (Integer_literal 0)))))))))
-   ((Assignment ((Record_access ((Id rec1) name)) (Integer_literal 3)))
-    (Assignment ((Record_access ((Id rec1) id)) (String_literal "")))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name rec1) (escape true) (typ ())
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp aname <opaque>) <opaque>) (id (IntExp 0) <opaque>)))
+       (typ rectype) (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((AssignExp (var (FieldVar (SimpleVar rec1 <opaque>) name <opaque>))
+       (exp (IntExp 3)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp (var (FieldVar (SimpleVar rec1 <opaque>) id <opaque>))
+       (exp (StringExp "" <opaque>)) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test24.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name d) (var_type_annotation ())
-      (var_content (Integer_literal 0)))))
-   ((L_value (Array_access ((Id d) (Integer_literal 3))))))))
+ (LetExp
+  (decs
+   ((VarDec (name d) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))))
+  (body
+   (SeqExp
+    (((VarExp (SubscriptVar (SimpleVar d <opaque>) (IntExp 3) <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test25.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name d) (var_type_annotation ())
-      (var_content (Integer_literal 0)))))
-   ((L_value (Record_access ((Id d) f)))))))
+ (LetExp
+  (decs
+   ((VarDec (name d) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))))
+  (body
+   (SeqExp
+    (((VarExp (FieldVar (SimpleVar d <opaque>) f <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test26.tig
-(Ok (Addition ((Integer_literal 3) (String_literal var))))
+(Ok
+ (OpExp (left (IntExp 3)) (oper PlusOp) (right (StringExp var <opaque>))
+  (pos <opaque>)))
 testcases/test27.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content (Integer_literal 0))))
-    (Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
-      (func_content (L_value (Id a))))))
-   ((Function_call (g ((Integer_literal 2))))))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))
+    (FunctionDec
+     (((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func g) (args ((IntExp 2))) (pos <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test28.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype1) (type_ (Record ((name string) (id int))))))
-    (Type_dec ((name rectype2) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name rec1) (var_type_annotation (rectype1))
-      (var_content
-       (Record
-        (rectype2 ((name (String_literal Name)) (id (Integer_literal 0)))))))))
-   ((L_value (Id rec1))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype1)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))
+      ((ty_name rectype2)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name rec1) (escape true) (typ ((rectype1 <opaque>)))
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp Name <opaque>) <opaque>) (id (IntExp 0) <opaque>)))
+       (typ rectype2) (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar rec1 <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test29.tig
 (Ok
- (Let
-  (((Type_dec ((name arrtype1) (type_ (Array int))))
-    (Type_dec ((name arrtype2) (type_ (Array int))))
-    (Var_dec
-     ((var_name arr1) (var_type_annotation (arrtype1))
-      (var_content
-       (Array (arrtype2 (Integer_literal 10) (Integer_literal 0)))))))
-   ((L_value (Id arr1))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name arrtype1) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name arrtype2) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name arr1) (escape true) (typ ((arrtype1 <opaque>)))
+     (init
+      (ArrayExp (typ arrtype2) (size (IntExp 10)) (init (IntExp 0))
+       (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar arr1 <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test3.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (age int))))))
-    (Var_dec
-     ((var_name rec1) (var_type_annotation (rectype))
-      (var_content
-       (Record
-        (rectype
-         ((name (String_literal Nobody)) (age (Integer_literal 1000)))))))))
-   ((Assignment ((Record_access ((Id rec1) name)) (String_literal Somebody)))
-    (L_value (Id rec1))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name age) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name rec1) (escape true) (typ ((rectype <opaque>)))
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp Nobody <opaque>) <opaque>)
+         (age (IntExp 1000) <opaque>)))
+       (typ rectype) (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((AssignExp (var (FieldVar (SimpleVar rec1 <opaque>) name <opaque>))
+       (exp (StringExp Somebody <opaque>)) (pos <opaque>))
+      <opaque>)
+     ((VarExp (SimpleVar rec1 <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test30.tig
 (Ok
- (Let
-  (((Type_dec ((name a) (type_ (Array int))))
-    (Type_dec ((name b) (type_ (Id a))))
-    (Var_dec
-     ((var_name arr1) (var_type_annotation (a))
-      (var_content (Array (b (Integer_literal 10) (Integer_literal 0)))))))
-   ((L_value (Array_access ((Id arr1) (Integer_literal 2))))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name a) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name b) (ty (NameTy a <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name arr1) (escape true) (typ ((a <opaque>)))
+     (init
+      (ArrayExp (typ b) (size (IntExp 10)) (init (IntExp 0)) (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((VarExp (SubscriptVar (SimpleVar arr1 <opaque>) (IntExp 2) <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test31.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name a) (var_type_annotation (int))
-      (var_content (String_literal " ")))))
-   ((L_value (Id a))))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ((int <opaque>)))
+     (init (StringExp " " <opaque>)) (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar a <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test32.tig
 (Ok
- (Let
-  (((Type_dec ((name arrayty) (type_ (Array int))))
-    (Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content
-       (Array (arrayty (Integer_literal 10) (String_literal " ")))))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name arrayty) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name a) (escape true) (typ ())
+     (init
+      (ArrayExp (typ arrayty) (size (IntExp 10))
+       (init (StringExp " " <opaque>)) (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test33.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content (Record (rectype ()))))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ())
+     (init (RecordExp (fields ()) (typ rectype) (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test34.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int) (b string)))
-      (func_type_annotation (int)) (func_content (L_value (Id a))))))
-   ((Function_call (g ((String_literal one) (String_literal two))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func g)
+       (args ((StringExp one <opaque>) (StringExp two <opaque>)))
+       (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test35.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int) (b string)))
-      (func_type_annotation (int)) (func_content (L_value (Id a))))))
-   ((Function_call (g ((String_literal one))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func g) (args ((StringExp one <opaque>))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test36.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int) (b string)))
-      (func_type_annotation (int)) (func_content (L_value (Id a))))))
-   ((Function_call
-     (g ((Integer_literal 3) (String_literal one) (Integer_literal 5))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func g)
+       (args ((IntExp 3) (StringExp one <opaque>) (IntExp 5)))
+       (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test37.tig
 (Ok
- (Let
-  (((Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content (Integer_literal 0))))
-    (Var_dec
-     ((var_name a) (var_type_annotation ())
-      (var_content (String_literal " ")))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ()) (init (IntExp 0)) (pos <opaque>))
+    (VarDec (name a) (escape true) (typ ()) (init (StringExp " " <opaque>))
+     (pos <opaque>))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test38.tig
 (Ok
- (Let
-  (((Type_dec ((name a) (type_ (Id int))))
-    (Type_dec ((name a) (type_ (Id string)))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name a) (ty (NameTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name a) (ty (NameTy string <opaque>)) (ty_pos <opaque>))))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test39.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
-      (func_content (L_value (Id a)))))
-    (Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
-      (func_content (L_value (Id a))))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))
+      ((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test4.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name nfactor) (arguments ((n int))) (func_type_annotation (int))
-      (func_content
-       (If_then_else
-        ((Eq ((L_value (Id n)) (Integer_literal 0))) (Integer_literal 1)
-         (Multiplication
-          ((L_value (Id n))
-           (Function_call
-            (nfactor ((Subtraction ((L_value (Id n)) (Integer_literal 1))))))))))))))
-   ((Function_call (nfactor ((Integer_literal 10))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name nfactor)
+       (params (((name n) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>)))
+       (body
+        (IfExp
+         (test
+          (OpExp (left (VarExp (SimpleVar n <opaque>))) (oper NeqOp)
+           (right (IntExp 0)) (pos <opaque>)))
+         (then_ (IntExp 1))
+         (else_
+          ((OpExp (left (VarExp (SimpleVar n <opaque>))) (oper TimesOp)
+            (right
+             (CallExp (func nfactor)
+              (args
+               ((OpExp (left (VarExp (SimpleVar n <opaque>))) (oper MinusOp)
+                 (right (IntExp 1)) (pos <opaque>))))
+              (pos <opaque>)))
+            (pos <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func nfactor) (args ((IntExp 10))) (pos <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test40.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation ())
-      (func_content (L_value (Id a))))))
-   ((Function_call (g ((Integer_literal 2))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ()) (body (VarExp (SimpleVar a <opaque>))) (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func g) (args ((IntExp 2))) (pos <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test41.tig
 (Ok
- (Let
-  (((Type_dec ((name a) (type_ (Id int)))))
-   ((Let (((Type_dec ((name a) (type_ (Id string))))) ((Integer_literal 0))))))))
+ (LetExp
+  (decs
+   ((TypeDec (((ty_name a) (ty (NameTy int <opaque>)) (ty_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((LetExp
+       (decs
+        ((TypeDec
+          (((ty_name a) (ty (NameTy string <opaque>)) (ty_pos <opaque>))))))
+       (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test42.tig
 (Ok
- (Let
-  (((Type_dec ((name arrtype1) (type_ (Array int))))
-    (Type_dec
-     ((name rectype1)
-      (type_ (Record ((name string) (address string) (id int) (age int))))))
-    (Type_dec ((name arrtype2) (type_ (Array rectype1))))
-    (Type_dec
-     ((name rectype2) (type_ (Record ((name string) (dates arrtype1))))))
-    (Type_dec ((name arrtype3) (type_ (Array string))))
-    (Var_dec
-     ((var_name arr1) (var_type_annotation ())
-      (var_content
-       (Array (arrtype1 (Integer_literal 10) (Integer_literal 0))))))
-    (Var_dec
-     ((var_name arr2) (var_type_annotation ())
-      (var_content
-       (Array
-        (arrtype2 (Integer_literal 5)
-         (Record
-          (rectype1
-           ((name (String_literal aname))
-            (address (String_literal somewhere)) (id (Integer_literal 0))
-            (age (Integer_literal 0))))))))))
-    (Var_dec
-     ((var_name arr3) (var_type_annotation (arrtype3))
-      (var_content
-       (Array (arrtype3 (Integer_literal 100) (String_literal ""))))))
-    (Var_dec
-     ((var_name rec1) (var_type_annotation ())
-      (var_content
-       (Record
-        (rectype1
-         ((name (String_literal Kapoios)) (address (String_literal Kapou))
-          (id (Integer_literal 2432)) (age (Integer_literal 44))))))))
-    (Var_dec
-     ((var_name rec2) (var_type_annotation ())
-      (var_content
-       (Record
-        (rectype2
-         ((name (String_literal Allos))
-          (dates
-           (Array (arrtype1 (Integer_literal 3) (Integer_literal 1900)))))))))))
-   ((Assignment
-     ((Array_access ((Id arr1) (Integer_literal 0))) (Integer_literal 1)))
-    (Assignment
-     ((Array_access ((Id arr1) (Integer_literal 9))) (Integer_literal 3)))
-    (Assignment
-     ((Record_access ((Array_access ((Id arr2) (Integer_literal 3))) name))
-      (String_literal kati)))
-    (Assignment
-     ((Record_access ((Array_access ((Id arr2) (Integer_literal 1))) age))
-      (Integer_literal 23)))
-    (Assignment
-     ((Array_access ((Id arr3) (Integer_literal 34))) (String_literal sfd)))
-    (Assignment ((Record_access ((Id rec1) name)) (String_literal sdf)))
-    (Assignment
-     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 0)))
-      (Integer_literal 2323)))
-    (Assignment
-     ((Array_access ((Record_access ((Id rec2) dates)) (Integer_literal 2)))
-      (Integer_literal 2323)))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name arrtype1) (ty (ArrayTy int <opaque>)) (ty_pos <opaque>))
+      ((ty_name rectype1)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name address) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>))
+          ((name age) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))
+      ((ty_name arrtype2) (ty (ArrayTy rectype1 <opaque>)) (ty_pos <opaque>))
+      ((ty_name rectype2)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name dates) (escape true) (typ arrtype1) (pos <opaque>)))))
+       (ty_pos <opaque>))
+      ((ty_name arrtype3) (ty (ArrayTy string <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name arr1) (escape true) (typ ())
+     (init
+      (ArrayExp (typ arrtype1) (size (IntExp 10)) (init (IntExp 0))
+       (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name arr2) (escape true) (typ ())
+     (init
+      (ArrayExp (typ arrtype2) (size (IntExp 5))
+       (init
+        (RecordExp
+         (fields
+          ((name (StringExp aname <opaque>) <opaque>)
+           (address (StringExp somewhere <opaque>) <opaque>)
+           (id (IntExp 0) <opaque>) (age (IntExp 0) <opaque>)))
+         (typ rectype1) (pos <opaque>)))
+       (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name arr3) (escape true) (typ ((arrtype3 <opaque>)))
+     (init
+      (ArrayExp (typ arrtype3) (size (IntExp 100))
+       (init (StringExp "" <opaque>)) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name rec1) (escape true) (typ ())
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp Kapoios <opaque>) <opaque>)
+         (address (StringExp Kapou <opaque>) <opaque>)
+         (id (IntExp 2432) <opaque>) (age (IntExp 44) <opaque>)))
+       (typ rectype1) (pos <opaque>)))
+     (pos <opaque>))
+    (VarDec (name rec2) (escape true) (typ ())
+     (init
+      (RecordExp
+       (fields
+        ((name (StringExp Allos <opaque>) <opaque>)
+         (dates
+          (ArrayExp (typ arrtype1) (size (IntExp 3)) (init (IntExp 1900))
+           (pos <opaque>))
+          <opaque>)))
+       (typ rectype2) (pos <opaque>)))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((AssignExp
+       (var (SubscriptVar (SimpleVar arr1 <opaque>) (IntExp 0) <opaque>))
+       (exp (IntExp 1)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var (SubscriptVar (SimpleVar arr1 <opaque>) (IntExp 9) <opaque>))
+       (exp (IntExp 3)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var
+        (FieldVar
+         (SubscriptVar (SimpleVar arr2 <opaque>) (IntExp 3) <opaque>) name
+         <opaque>))
+       (exp (StringExp kati <opaque>)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var
+        (FieldVar
+         (SubscriptVar (SimpleVar arr2 <opaque>) (IntExp 1) <opaque>) age
+         <opaque>))
+       (exp (IntExp 23)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var (SubscriptVar (SimpleVar arr3 <opaque>) (IntExp 34) <opaque>))
+       (exp (StringExp sfd <opaque>)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp (var (FieldVar (SimpleVar rec1 <opaque>) name <opaque>))
+       (exp (StringExp sdf <opaque>)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var
+        (SubscriptVar (FieldVar (SimpleVar rec2 <opaque>) dates <opaque>)
+         (IntExp 0) <opaque>))
+       (exp (IntExp 2323)) (pos <opaque>))
+      <opaque>)
+     ((AssignExp
+       (var
+        (SubscriptVar (FieldVar (SimpleVar rec2 <opaque>) dates <opaque>)
+         (IntExp 2) <opaque>))
+       (exp (IntExp 2323)) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test43.tig
 (Ok
- (Let
-  (((Var_dec ((var_name a) (var_type_annotation ()) (var_content No_value))))
-   ((Addition ((L_value (Id a)) (Integer_literal 3)))))))
+ (LetExp
+  (decs
+   ((VarDec (name a) (escape true) (typ ()) (init (SeqExp ()))
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+       (right (IntExp 3)) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test44.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
-   ((Assignment ((Id b) Nil))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name b) (escape true) (typ ((rectype <opaque>))) (init NilExp)
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((AssignExp (var (SimpleVar b <opaque>)) (exp NilExp) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test45.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec ((var_name a) (var_type_annotation ()) (var_content Nil))))
-   ((L_value (Id a))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name a) (escape true) (typ ()) (init NilExp) (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar a <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test46.tig
 (Ok
- (Let
-  (((Type_dec ((name rectype) (type_ (Record ((name string) (id int))))))
-    (Var_dec
-     ((var_name b) (var_type_annotation (rectype)) (var_content Nil))))
-   ((Eq ((L_value (Id b)) Nil)) (Neq ((L_value (Id b)) Nil))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name rectype)
+       (ty
+        (RecordTy
+         (((name name) (escape true) (typ string) (pos <opaque>))
+          ((name id) (escape true) (typ int) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name b) (escape true) (typ ((rectype <opaque>))) (init NilExp)
+     (pos <opaque>))))
+  (body
+   (SeqExp
+    (((OpExp (left (VarExp (SimpleVar b <opaque>))) (oper NeqOp)
+       (right NilExp) (pos <opaque>))
+      <opaque>)
+     ((OpExp (left (VarExp (SimpleVar b <opaque>))) (oper EqOp)
+       (right NilExp) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test47.tig
 (Ok
- (Let
-  (((Type_dec ((name a) (type_ (Id int))))
-    (Var_dec
-     ((var_name b) (var_type_annotation ())
-      (var_content (Integer_literal 4))))
-    (Type_dec ((name a) (type_ (Id string)))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((TypeDec (((ty_name a) (ty (NameTy int <opaque>)) (ty_pos <opaque>))))
+    (VarDec (name b) (escape true) (typ ()) (init (IntExp 4)) (pos <opaque>))
+    (TypeDec (((ty_name a) (ty (NameTy string <opaque>)) (ty_pos <opaque>))))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test48.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
-      (func_content (L_value (Id a)))))
-    (Type_dec ((name t) (type_ (Id int))))
-    (Func_dec
-     ((func_name g) (arguments ((a int))) (func_type_annotation (int))
-      (func_content (L_value (Id a))))))
-   ((Integer_literal 0)))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))
+    (TypeDec (((ty_name t) (ty (NameTy int <opaque>)) (ty_pos <opaque>))))
+    (FunctionDec
+     (((fun_name g)
+       (params (((name a) (escape true) (typ int) (pos <opaque>))))
+       (result ((int <opaque>))) (body (VarExp (SimpleVar a <opaque>)))
+       (fun_pos <opaque>))))))
+  (body (SeqExp (((IntExp 0) <opaque>)))) (pos <opaque>)))
 testcases/test49.tig
 (Error " (line 5 column 21): syntax error")
 testcases/test5.tig
 (Ok
- (Let
-  (((Type_dec ((name intlist) (type_ (Record ((hd int) (tl intlist))))))
-    (Type_dec ((name tree) (type_ (Record ((key int) (children treelist))))))
-    (Type_dec ((name treelist) (type_ (Record ((hd tree) (tl treelist))))))
-    (Var_dec
-     ((var_name lis) (var_type_annotation (intlist))
-      (var_content (Record (intlist ((hd (Integer_literal 0)) (tl Nil))))))))
-   ((L_value (Id lis))))))
+ (LetExp
+  (decs
+   ((TypeDec
+     (((ty_name intlist)
+       (ty
+        (RecordTy
+         (((name hd) (escape true) (typ int) (pos <opaque>))
+          ((name tl) (escape true) (typ intlist) (pos <opaque>)))))
+       (ty_pos <opaque>))
+      ((ty_name tree)
+       (ty
+        (RecordTy
+         (((name key) (escape true) (typ int) (pos <opaque>))
+          ((name children) (escape true) (typ treelist) (pos <opaque>)))))
+       (ty_pos <opaque>))
+      ((ty_name treelist)
+       (ty
+        (RecordTy
+         (((name hd) (escape true) (typ tree) (pos <opaque>))
+          ((name tl) (escape true) (typ treelist) (pos <opaque>)))))
+       (ty_pos <opaque>))))
+    (VarDec (name lis) (escape true) (typ ((intlist <opaque>)))
+     (init
+      (RecordExp (fields ((hd (IntExp 0) <opaque>) (tl NilExp <opaque>)))
+       (typ intlist) (pos <opaque>)))
+     (pos <opaque>))))
+  (body (SeqExp (((VarExp (SimpleVar lis <opaque>)) <opaque>))))
+  (pos <opaque>)))
 testcases/test6.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name do_nothing1) (arguments ((a int) (b string)))
-      (func_type_annotation ())
-      (func_content
-       (Function_call
-        (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1)))))))))
-    (Func_dec
-     ((func_name do_nothing2) (arguments ((d int))) (func_type_annotation ())
-      (func_content
-       (Function_call (do_nothing1 ((L_value (Id d)) (String_literal str))))))))
-   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name do_nothing1)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ())
+       (body
+        (CallExp (func do_nothing2)
+         (args
+          ((OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+            (right (IntExp 1)) (pos <opaque>))))
+         (pos <opaque>)))
+       (fun_pos <opaque>))
+      ((fun_name do_nothing2)
+       (params (((name d) (escape true) (typ int) (pos <opaque>))))
+       (result ())
+       (body
+        (CallExp (func do_nothing1)
+         (args ((VarExp (SimpleVar d <opaque>)) (StringExp str <opaque>)))
+         (pos <opaque>)))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func do_nothing1)
+       (args ((IntExp 0) (StringExp str2 <opaque>))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test7.tig
 (Ok
- (Let
-  (((Func_dec
-     ((func_name do_nothing1) (arguments ((a int) (b string)))
-      (func_type_annotation (int))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing2 ((Addition ((L_value (Id a)) (Integer_literal 1))))))
-         (Integer_literal 0))))))
-    (Func_dec
-     ((func_name do_nothing2) (arguments ((d int)))
-      (func_type_annotation (string))
-      (func_content
-       (Sequence
-        ((Function_call
-          (do_nothing1 ((L_value (Id d)) (String_literal str))))
-         (String_literal " ")))))))
-   ((Function_call (do_nothing1 ((Integer_literal 0) (String_literal str2))))))))
+ (LetExp
+  (decs
+   ((FunctionDec
+     (((fun_name do_nothing1)
+       (params
+        (((name a) (escape true) (typ int) (pos <opaque>))
+         ((name b) (escape true) (typ string) (pos <opaque>))))
+       (result ((int <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing2)
+            (args
+             ((OpExp (left (VarExp (SimpleVar a <opaque>))) (oper PlusOp)
+               (right (IntExp 1)) (pos <opaque>))))
+            (pos <opaque>))
+           <opaque>)
+          ((IntExp 0) <opaque>))))
+       (fun_pos <opaque>))
+      ((fun_name do_nothing2)
+       (params (((name d) (escape true) (typ int) (pos <opaque>))))
+       (result ((string <opaque>)))
+       (body
+        (SeqExp
+         (((CallExp (func do_nothing1)
+            (args ((VarExp (SimpleVar d <opaque>)) (StringExp str <opaque>)))
+            (pos <opaque>))
+           <opaque>)
+          ((StringExp " " <opaque>) <opaque>))))
+       (fun_pos <opaque>))))))
+  (body
+   (SeqExp
+    (((CallExp (func do_nothing1)
+       (args ((IntExp 0) (StringExp str2 <opaque>))) (pos <opaque>))
+      <opaque>))))
+  (pos <opaque>)))
 testcases/test8.tig
 (Ok
- (If_then_else
-  ((Parentheses (Gt ((Integer_literal 10) (Integer_literal 20))))
-   (Integer_literal 30) (Integer_literal 40))))
+ (IfExp
+  (test
+   (OpExp (left (IntExp 10)) (oper GtOp) (right (IntExp 20)) (pos <opaque>)))
+  (then_ (IntExp 30)) (else_ ((IntExp 40))) (pos <opaque>)))
 testcases/test9.tig
 (Ok
- (If_then_else
-  ((Parentheses (Gt ((Integer_literal 5) (Integer_literal 4))))
-   (Integer_literal 13) (String_literal " "))))
+ (IfExp
+  (test
+   (OpExp (left (IntExp 5)) (oper GtOp) (right (IntExp 4)) (pos <opaque>)))
+  (then_ (IntExp 13)) (else_ ((StringExp " " <opaque>))) (pos <opaque>)))
