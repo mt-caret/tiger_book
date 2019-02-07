@@ -1,0 +1,7 @@
+(executable
+  (name tiger_parser)
+  (libraries async core)
+  (preprocess (pps ppx_jane)))
+
+(menhir (modules parser))
+(ocamllex (modules lexer))
