@@ -1,54 +1,59 @@
 open Core_kernel
 
 type pos = Lexing.position sexp_opaque [@@deriving sexp]
-type symbol = string [@@deriving sexp, compare]
 
 type field =
-  { name : symbol
+  { name : Symbol.t
   ; escape : bool ref
-  ; typ : symbol
+  ; typ : Symbol.t
   ; pos : pos }
 [@@deriving sexp]
 
 type var =
-  | SimpleVar of symbol * pos
-  | FieldVar of var * symbol * pos
+  | SimpleVar of Symbol.t * pos
+  | FieldVar of var * Symbol.t * pos
   | SubscriptVar of var * exp * pos
 [@@deriving sexp]
 
 and exp =
   | VarExp of var
-  | NilExp
-  | IntExp of int
+  | NilExp of pos
+  | IntExp of int * pos
   | StringExp of string * pos
-  | CallExp of {func : symbol; args : exp list; pos : pos}
+  | CallExp of {func : Symbol.t; args : exp list; pos : pos}
   | OpExp of {left : exp; oper : oper; right : exp; pos : pos}
-  | RecordExp of {fields : (symbol * exp * pos) list; typ : symbol; pos : pos}
-  | SeqExp of (exp * pos) list
+  | RecordExp of {fields : (Symbol.t * exp * pos) list; typ : Symbol.t; pos : pos}
+  | SeqExp of (exp * pos) list * pos
   | AssignExp of {var : var; exp : exp; pos : pos}
   | IfExp of {test : exp; then_ : exp; else_ : exp option; pos : pos}
   | WhileExp of {test : exp; body : exp; pos : pos}
-  | ForExp of {var : symbol; escape : bool ref; lo : exp; hi : exp; body : exp; pos : pos}
+  | ForExp of
+      { var : Symbol.t
+      ; escape : bool ref
+      ; lo : exp
+      ; hi : exp
+      ; body : exp
+      ; pos : pos }
   | BreakExp of pos
   | LetExp of {decs : dec list; body : exp; pos : pos}
-  | ArrayExp of {typ : symbol; size : exp; init : exp; pos : pos}
+  | ArrayExp of {typ : Symbol.t; size : exp; init : exp; pos : pos}
 [@@deriving sexp]
 
 and dec =
   | FunctionDec of fundec list
   | VarDec of
-      { name : symbol
+      { name : Symbol.t
       ; escape : bool ref
-      ; typ : (symbol * pos) option
+      ; typ : (Symbol.t * pos) option
       ; init : exp
       ; pos : pos }
   | TypeDec of tydec list
 [@@deriving sexp]
 
 and ty =
-  | NameTy of symbol * pos
+  | NameTy of Symbol.t * pos
   | RecordTy of field list
-  | ArrayTy of symbol * pos
+  | ArrayTy of Symbol.t * pos
 [@@deriving sexp]
 
 and oper =
@@ -65,15 +70,15 @@ and oper =
 [@@deriving sexp]
 
 and fundec =
-  { fun_name : symbol
+  { fun_name : Symbol.t
   ; params : field list
-  ; result : (symbol * pos) option
+  ; result : (Symbol.t * pos) option
   ; body : exp
   ; fun_pos : pos }
 [@@deriving sexp]
 
 and tydec =
-  { ty_name : symbol
+  { ty_name : Symbol.t
   ; ty : ty
   ; ty_pos : pos }
 [@@deriving sexp]

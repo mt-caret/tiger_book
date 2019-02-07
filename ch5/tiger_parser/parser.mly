@@ -81,7 +81,7 @@ program:
   ;
 
 literal:
-  | i = INT { IntExp i }
+  | i = INT { IntExp (i, $startpos) }
   | s = STRING { StringExp (s, $startpos) }
   ;
 
@@ -92,19 +92,19 @@ seqexp:
   e = exp { (e, $startpos) };
 
 term:
-  | NIL { NilExp }
+  | NIL { NilExp $startpos }
   | LPAREN; e = seqexp; SEMICOLON; es = separated_nonempty_list(SEMICOLON, seqexp); RPAREN
-    { SeqExp (e :: es) }
-  | LPAREN; RPAREN { SeqExp [] }
+    { SeqExp (e :: es, $startpos) }
+  | LPAREN; RPAREN { SeqExp ([], $startpos) }
   | l = literal { l }
   | MINUS; right = term
-    { OpExp { left = IntExp 0; oper = MinusOp; right; pos = $startpos } }
+    { OpExp { left = IntExp (0, $startpos); oper = MinusOp; right; pos = $startpos } }
   | func = ID; LPAREN; args = separated_list(COMMA, exp); RPAREN
     { CallExp { func; args; pos = $startpos } }
   | test = term; OR; else_ = term
-    { IfExp { test; then_ = IntExp 1; else_ = Some else_; pos = $startpos } }
+    { IfExp { test; then_ = IntExp (1, $startpos); else_ = Some else_; pos = $startpos } }
   | test = term; AND; then_ = term
-    { IfExp { test; then_; else_ = Some (IntExp 0); pos = $startpos } }
+    { IfExp { test; then_; else_ = Some (IntExp (0, $startpos)); pos = $startpos } }
   | left = term; GE; right = term
     { OpExp { left; oper = GeOp; right; pos = $startpos } }
   | left = term; GT; right = term
@@ -147,7 +147,7 @@ exp:
   | typ = ID; LBRACK; size = exp; RBRACK; OF init = exp
     { ArrayExp { typ; size; init; pos = $startpos } }
   | LET; decs = list(dec); IN; exps = separated_list(SEMICOLON, seqexp); END
-    { LetExp { decs = compact_decs decs; body = SeqExp exps; pos = $startpos } }
+    { LetExp { decs = compact_decs decs; body = SeqExp (exps, $startpos(exps)); pos = $startpos } }
   | var = l_value; exp = assign
     { AssignExp { var; exp; pos = $startpos } }
   ;
