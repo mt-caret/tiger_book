@@ -1,6 +1,6 @@
 (executable
   (name tiger_parser)
-  (libraries async core)
+  (libraries async core_kernel)
   (preprocess (pps ppx_jane)))
 
 (menhir (modules parser))
