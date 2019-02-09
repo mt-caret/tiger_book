@@ -52,7 +52,7 @@ and dec =
 
 and ty =
   | NameTy of Symbol.t * pos
-  | RecordTy of field list
+  | RecordTy of field list * pos
   | ArrayTy of Symbol.t * pos
 [@@deriving sexp]
 

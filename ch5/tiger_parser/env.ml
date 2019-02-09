@@ -11,20 +11,18 @@ type tenv = Type.t Symbol.Map.t [@@deriving sexp]
 type venv = Entry.t Symbol.Map.t [@@deriving sexp]
 
 let rec actual_type (pos : Lexing.position) tenv (ty : Type.t) =
-  let open Or_error.Let_syntax in
   match ty with
   | NAME (sym, t_opt_ref) ->
     (match !t_opt_ref with
-    | Some t -> Ok t
+    | Some t -> actual_type pos tenv t
     | None ->
-      (match Symbol.Map.find tenv sym with
-      | Some new_ty ->
-        let%map result = actual_type pos tenv new_ty in
-        t_opt_ref := Some result;
-        result
-      | None -> sprintf "%s not found" sym |> Util.error_of_string pos |> Result.fail))
+      sprintf "dangling reference from type %s" sym |> Util.or_error_of_string pos)
   | t -> Ok t
 ;;
 
-let base_tenv = Symbol.Map.empty
-let base_venv = Symbol.Map.empty
+let base_tenv = Symbol.Map.of_alist_exn ["int", Type.INT; "string", Type.STRING]
+
+let base_venv =
+  (* TODO: add predefined function bindings (p.114) *)
+  Symbol.Map.empty
+;;

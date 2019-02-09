@@ -182,7 +182,7 @@ tydec:
   TYPE; ty_name = ID; EQ; ty = type_ { { ty_name; ty; ty_pos = $startpos } };
 
 type_:
-  | LBRACE; t = tyfields; RBRACE { RecordTy t }
+  | LBRACE; t = tyfields; RBRACE { RecordTy (t, $startpos) }
   | ARRAY; OF; t = ID { ArrayTy (t, $startpos) }
   | t = ID { NameTy (t, $startpos) }
   ;
