@@ -18,8 +18,21 @@ let type_check pos expected_type ty =
       "expected type %s but found %s"
       (Type.to_string expected_type)
       (Type.to_string ty)
-    |> Util.error_of_string pos
-    |> Result.fail
+    |> Util.or_error_of_string pos
+;;
+
+let lookup_actual_type pos tenv typ =
+  match Symbol.Map.find tenv typ with
+  | None -> sprintf "type %s not found" typ |> Util.or_error_of_string pos
+  | Some ty -> Env.actual_type pos tenv ty
+;;
+
+let add_entry_to_venv pos venv symbol (entry : Env.Entry.t) =
+  match Symbol.Map.add venv ~key:symbol ~data:entry with
+  | `Duplicate ->
+    let entry_type = match entry with VarEntry _ -> "var" | FunEntry _ -> "function" in
+    sprintf "%s %s already exists" entry_type symbol |> Util.or_error_of_string pos
+  | `Ok venv_with_entry -> Ok venv_with_entry
 ;;
 
 let rec transVar venv tenv (var : Absyn.var) =
@@ -54,8 +67,8 @@ let rec transVar venv tenv (var : Absyn.var) =
 
 and check_int venv tenv e =
   let open Or_error.Let_syntax in
-  let%bind res = transExp venv tenv e in
-  type_check res.pos INT res.ty
+  let%bind {exp = _; ty; pos} = transExp venv tenv e in
+  type_check pos INT ty
 
 and transExp venv tenv (exp : Absyn.exp) =
   let open Or_error.Let_syntax in
@@ -92,32 +105,29 @@ and transExp venv tenv (exp : Absyn.exp) =
     | INT, INT -> Ok {exp = (); ty = INT; pos}
     | _, _ -> Util.or_error_of_string pos "integer required")
   | RecordExp {fields; typ; pos} ->
-    (match Symbol.Map.find tenv typ with
-    | None -> sprintf "type %s not found" typ |> Util.or_error_of_string pos
-    | Some ty ->
-      (match%bind Env.actual_type pos tenv ty with
-      | RECORD (expected_fields, _) as actual_ty ->
-        let%map () =
-          List.fold_result fields ~init:() ~f:(fun () (field, e, pos) ->
-              let%bind {exp = _; ty; pos = _} = transExp venv tenv e in
-              match List.Assoc.find ~equal:Symbol.equal expected_fields field with
-              | None ->
-                sprintf "unexpected field %s" field |> Util.or_error_of_string pos
-              | Some expected_type -> type_check pos expected_type ty )
-        and () =
-          List.fold_result expected_fields ~init:() ~f:(fun () (expected_field, _) ->
-              let match_field (field, _, _) = String.equal field expected_field in
-              if List.exists fields ~f:match_field
-              then Ok ()
-              else
-                sprintf "field %s not found" expected_field
-                |> Util.or_error_of_string pos )
-        in
-        {exp = (); ty = actual_ty; pos}
-      | _ ->
-        Type.to_string ty
-        |> sprintf "expected record but found %s"
-        |> Util.or_error_of_string pos))
+    let%bind ty = lookup_actual_type pos tenv typ in
+    (match ty with
+    | RECORD (expected_fields, _) as actual_ty ->
+      let%map () =
+        List.fold_result fields ~init:() ~f:(fun () (field, e, pos) ->
+            let%bind {exp = _; ty; pos = _} = transExp venv tenv e in
+            match List.Assoc.find ~equal:Symbol.equal expected_fields field with
+            | None -> sprintf "unexpected field %s" field |> Util.or_error_of_string pos
+            | Some expected_type -> type_check pos expected_type ty )
+      and () =
+        List.fold_result expected_fields ~init:() ~f:(fun () (expected_field, _) ->
+            let match_field (field, _, _) = String.equal field expected_field in
+            if List.exists fields ~f:match_field
+            then Ok ()
+            else
+              sprintf "field %s not found" expected_field |> Util.or_error_of_string pos
+        )
+      in
+      {exp = (); ty = actual_ty; pos}
+    | _ ->
+      Type.to_string ty
+      |> sprintf "expected record but found %s"
+      |> Util.or_error_of_string pos)
   | SeqExp (exps, pos) ->
     let no_value = {exp = (); ty = UNIT; pos} in
     List.fold_result exps ~init:no_value ~f:(fun _ (e, _) -> transExp venv tenv e)
@@ -142,12 +152,10 @@ and transExp venv tenv (exp : Absyn.exp) =
   | ForExp {var; escape = _; lo; hi; body; pos} ->
     (* TODO: deal with escape? *)
     let%bind () = check_int venv tenv lo
-    and () = check_int venv tenv hi in
-    (match Symbol.Map.add venv ~key:var ~data:(VarEntry {ty = INT}) with
-    | `Duplicate -> sprintf "var %s already exists" var |> Util.or_error_of_string pos
-    | `Ok venv_with_var ->
-      let%map {exp = _; ty = _; pos = _} = transExp venv_with_var tenv body in
-      {exp = (); ty = UNIT; pos})
+    and () = check_int venv tenv hi
+    and venv_with_var = add_entry_to_venv pos venv var (VarEntry {ty = INT}) in
+    let%map {exp = _; ty = _; pos = _} = transExp venv_with_var tenv body in
+    {exp = (); ty = UNIT; pos}
   | BreakExp pos -> Ok {exp = (); ty = UNIT; pos}
   | LetExp {decs; body; pos = _} ->
     let%bind venv', tenv' =
@@ -156,18 +164,29 @@ and transExp venv tenv (exp : Absyn.exp) =
     in
     transExp venv' tenv' body
   | ArrayExp {typ; size; init; pos} ->
-    (match Symbol.Map.find tenv typ with
-    | None -> sprintf "type %s not found" typ |> Util.or_error_of_string pos
-    | Some ty ->
-      let%bind () = check_int venv tenv size
-      and {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
-      (match%bind Env.actual_type pos tenv ty with
-      | ARRAY (array_ty, _) as result_ty ->
-        let%map () = type_check init_pos array_ty init_ty in
-        {exp = (); ty = result_ty; pos}
-      | t ->
-        sprintf "expected array but found %s" (Type.to_string t)
-        |> Util.or_error_of_string pos))
+    let%bind () = check_int venv tenv size
+    and {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
+    (match%bind lookup_actual_type pos tenv typ with
+    | ARRAY (array_ty, _) as result_ty ->
+      let%map () = type_check init_pos array_ty init_ty in
+      {exp = (); ty = result_ty; pos}
+    | t ->
+      sprintf "expected array but found %s" (Type.to_string t)
+      |> Util.or_error_of_string pos)
 
-and transDec _venv _tenv _dec = failwith "TODO"
+and transDec venv tenv (dec : Absyn.dec) =
+  let open Or_error.Let_syntax in
+  match dec with
+  | VarDec {name; escape = _; typ; init; pos} ->
+    (* TODO deal with escape *)
+    let%bind {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
+    let%bind expected_ty =
+      Option.map ~f:(fun (t, p) -> lookup_actual_type p tenv t) typ
+      |> Option.value ~default:(Ok init_ty)
+    in
+    let%map () = type_check init_pos expected_ty init_ty
+    and venv_with_var = add_entry_to_venv pos venv name (VarEntry {ty = init_ty}) in
+    venv_with_var, tenv
+  | _ -> failwith "TODO"
+
 and transTy _tenv _ty = failwith "TODO"
