@@ -123,12 +123,13 @@ and transExp venv tenv (exp : Absyn.exp) =
         sprintf "%s expects %d arguments but found %d" func formals_length args_length
         |> Util.or_error_of_string pos
       else
-        let%map () =
+        let%map _ : unit list =
           List.zip_exn formals args
-          |> List.fold_result ~init:() ~f:(fun () (expected_type, e) ->
+          |> List.map ~f:(fun (expected_type, e) ->
                  let%bind {exp = _; ty; pos} = transExp venv tenv e
                  and actual_expected_type = Type.skip_names pos expected_type in
                  type_check pos actual_expected_type ty )
+          |> Or_error.all
         in
         {exp = (); ty = result; pos})
   | OpExp {left; oper; right; pos} ->
@@ -194,20 +195,22 @@ and transExp venv tenv (exp : Absyn.exp) =
   | RecordExp {fields; typ; pos} ->
     (match%bind lookup_actual_type pos tenv typ with
     | RECORD (expected_fields, _) as actual_ty ->
-      let%map () =
-        List.fold_result fields ~init:() ~f:(fun () (field, e, pos) ->
+      let%map _ : unit list =
+        List.map fields ~f:(fun (field, e, pos) ->
             let%bind {exp = _; ty; pos = _} = transExp venv tenv e in
             match List.Assoc.find ~equal:Symbol.equal expected_fields field with
             | None -> sprintf "unexpected field %s" field |> Util.or_error_of_string pos
             | Some expected_type -> type_check pos expected_type ty )
-      and () =
-        List.fold_result expected_fields ~init:() ~f:(fun () (expected_field, _) ->
+        |> Or_error.all
+      and _ : unit list =
+        List.map expected_fields ~f:(fun (expected_field, _) ->
             let match_field (field, _, _) = String.equal field expected_field in
             if List.exists fields ~f:match_field
             then Ok ()
             else
               sprintf "field %s not found" expected_field |> Util.or_error_of_string pos
         )
+        |> Or_error.all
       in
       {exp = (); ty = actual_ty; pos}
     | ty ->
@@ -295,11 +298,8 @@ and transDec venv tenv (dec : Absyn.dec) =
           let func = Env.Entry.FunEntry {formals; result = result_type} in
           add_entry_to_venv accum_venv fun_name func )
     in
-    let%map () =
-      List.fold_result
-        fundecs
-        ~init:()
-        ~f:(fun () {fun_name; params; result = _; body; fun_pos = _} ->
+    let%map _ : unit list =
+      List.map fundecs ~f:(fun {fun_name; params; result = _; body; fun_pos = _} ->
           let formals, result_type =
             match Symbol.Map.find_exn venv_with_funcs fun_name with
             | FunEntry {formals; result} -> formals, result
@@ -316,6 +316,7 @@ and transDec venv tenv (dec : Absyn.dec) =
           in
           let%bind {exp = _; ty; pos} = transExp venv_with_params tenv body in
           type_check pos result_type ty )
+      |> Or_error.all
     in
     venv_with_funcs, tenv
   | VarDec {name; escape = _; typ; init; pos} ->
@@ -342,17 +343,24 @@ and transDec venv tenv (dec : Absyn.dec) =
         sprintf "duplicate definition of type %s" ty_name
         |> Util.or_error_of_string ty_pos
     in
-    (* TODO: check for mutually recursive types that don't pass through record or array *)
     let tenv_with_types =
       List.fold tydecs ~init:tenv ~f:(fun accum_tenv {ty_name; ty = _; ty_pos = _} ->
           let new_type = Type.NAME (ty_name, ref None) in
           Symbol.Map.set accum_tenv ~key:ty_name ~data:new_type )
     in
-    let%map () =
-      List.fold_result tydecs ~init:() ~f:(fun () {ty_name; ty; ty_pos} ->
+    let%bind _ : unit list =
+      List.map tydecs ~f:(fun {ty_name; ty; ty_pos} ->
           let%bind {exp = _; ty = rhs_ty; pos = _} = transTy tenv_with_types ty in
           let named_type = Symbol.Map.find_exn tenv_with_types ty_name in
           type_check ty_pos rhs_ty named_type )
+      |> Or_error.all
+    in
+    let%map _ : unit list =
+      List.map tydecs ~f:(fun {ty_name; ty = _; ty_pos} ->
+          if Symbol.Map.find_exn tenv_with_types ty_name |> Type.has_illegal_cycle
+          then sprintf "illegal cycle in %s" ty_name |> Util.or_error_of_string ty_pos
+          else Ok () )
+      |> Or_error.all
     in
     venv, tenv_with_types
 ;;

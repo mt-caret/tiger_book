@@ -94,3 +94,19 @@ let rec is_decided = function
   | NAME (_, t_opt_ref) ->
     (match !t_opt_ref with None -> false | Some t -> is_decided t)
 ;;
+
+(** Floyd's cycle-finding algorithm *)
+let has_illegal_cycle (t : t) =
+  let next_type (t : t) =
+    match t with
+    | INT | STRING | UNIT | RECORD _ | ARRAY _ | NIL -> None
+    | NAME (_, t_opt_ref) -> !t_opt_ref
+  in
+  let next_next_type t = next_type t |> Option.bind ~f:next_type in
+  let rec go (t1 : t) (t2 : t) =
+    match next_type t1, next_next_type t2 with
+    | None, _ | _, None -> false
+    | Some t1', Some t2' -> phys_equal t1' t2' || go t1' t2'
+  in
+  go t t
+;;

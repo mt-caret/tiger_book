@@ -21,3 +21,4 @@ val to_string : t -> string
 val equal : t -> t -> bool
 val skip_names : Lexing.position -> t -> t Or_error.t
 val is_decided : t -> bool
+val has_illegal_cycle : t -> bool
