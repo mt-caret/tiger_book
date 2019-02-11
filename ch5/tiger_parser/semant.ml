@@ -62,7 +62,7 @@ let transTy tenv (typ : Absyn.ty) =
     {exp = (); ty = ARRAY (element_ty, Type.Unique.create ()); pos}
 ;;
 
-let rec transVar venv tenv (var : Absyn.var) =
+let rec transVar venv tenv ~in_loop (var : Absyn.var) =
   let open Or_error.Let_syntax in
   match var with
   | SimpleVar (s, pos) ->
@@ -74,7 +74,7 @@ let rec transVar venv tenv (var : Absyn.var) =
       let%map actual_ty = Type.skip_names pos ty in
       {exp = (); ty = actual_ty; pos})
   | FieldVar (record_var, field, pos) ->
-    let%bind {exp = _; ty; pos = _} = transVar venv tenv record_var in
+    let%bind {exp = _; ty; pos = _} = transVar venv tenv ~in_loop record_var in
     (match ty with
     | RECORD (fields, _) as record_ty ->
       (match List.Assoc.find fields field ~equal:Symbol.equal with
@@ -88,8 +88,8 @@ let rec transVar venv tenv (var : Absyn.var) =
       sprintf "expected record but found %s" (Type.to_string ty)
       |> Util.or_error_of_string pos)
   | SubscriptVar (array_var, e, pos) ->
-    let%bind {exp = _; ty; pos = _} = transVar venv tenv array_var
-    and () = check_int venv tenv e in
+    let%bind {exp = _; ty; pos = _} = transVar venv tenv ~in_loop array_var
+    and () = check_int venv tenv ~in_loop e in
     (match ty with
     | ARRAY (element_ty, _) ->
       let%map actual_ty = Type.skip_names pos element_ty in
@@ -98,15 +98,15 @@ let rec transVar venv tenv (var : Absyn.var) =
       sprintf "expected array but found %s" (Type.to_string ty)
       |> Util.or_error_of_string pos)
 
-and check_int venv tenv e =
+and check_int venv tenv ~in_loop e =
   let open Or_error.Let_syntax in
-  let%bind {exp = _; ty; pos} = transExp venv tenv e in
+  let%bind {exp = _; ty; pos} = transExp venv tenv ~in_loop e in
   type_check pos INT ty
 
-and transExp venv tenv (exp : Absyn.exp) =
+and transExp venv tenv ~in_loop (exp : Absyn.exp) =
   let open Or_error.Let_syntax in
   match exp with
-  | VarExp v -> transVar venv tenv v
+  | VarExp v -> transVar venv tenv ~in_loop v
   | NilExp pos -> Ok {exp = (); ty = NIL; pos}
   | IntExp (_, pos) -> Ok {exp = (); ty = INT; pos}
   | StringExp (_, pos) -> Ok {exp = (); ty = STRING; pos}
@@ -126,15 +126,15 @@ and transExp venv tenv (exp : Absyn.exp) =
         let%map _ : unit list =
           List.zip_exn formals args
           |> List.map ~f:(fun (expected_type, e) ->
-                 let%bind {exp = _; ty; pos} = transExp venv tenv e
+                 let%bind {exp = _; ty; pos} = transExp venv tenv ~in_loop e
                  and actual_expected_type = Type.skip_names pos expected_type in
                  type_check pos actual_expected_type ty )
           |> Or_error.all
         in
         {exp = (); ty = result; pos})
   | OpExp {left; oper; right; pos} ->
-    let%bind {exp = _; ty = tyleft; pos = posleft} = transExp venv tenv left
-    and {exp = _; ty = tyright; pos = posright} = transExp venv tenv right in
+    let%bind {exp = _; ty = tyleft; pos = posleft} = transExp venv tenv ~in_loop left
+    and {exp = _; ty = tyright; pos = posright} = transExp venv tenv ~in_loop right in
     let%map () =
       match oper with
       | PlusOp | MinusOp | TimesOp | DivideOp ->
@@ -197,7 +197,7 @@ and transExp venv tenv (exp : Absyn.exp) =
     | RECORD (expected_fields, _) as actual_ty ->
       let%map _ : unit list =
         List.map fields ~f:(fun (field, e, pos) ->
-            let%bind {exp = _; ty; pos = _} = transExp venv tenv e in
+            let%bind {exp = _; ty; pos = _} = transExp venv tenv ~in_loop e in
             match List.Assoc.find ~equal:Symbol.equal expected_fields field with
             | None -> sprintf "unexpected field %s" field |> Util.or_error_of_string pos
             | Some expected_type -> type_check pos expected_type ty )
@@ -219,44 +219,52 @@ and transExp venv tenv (exp : Absyn.exp) =
       |> Util.or_error_of_string pos)
   | SeqExp (exps, pos) ->
     let no_value = {exp = (); ty = UNIT; pos} in
-    List.fold_result exps ~init:no_value ~f:(fun _ (e, _) -> transExp venv tenv e)
+    List.fold_result exps ~init:no_value ~f:(fun _ (e, _) ->
+        transExp venv tenv ~in_loop e )
   | AssignExp {var; exp; pos} ->
-    let%bind {exp = _; ty = expected_type; pos = _} = transVar venv tenv var
-    and {exp = _; ty; pos = _} = transExp venv tenv exp in
+    let%bind {exp = _; ty = expected_type; pos = _} = transVar venv tenv ~in_loop var
+    and {exp = _; ty; pos = _} = transExp venv tenv ~in_loop exp in
     let%map () = type_check pos expected_type ty in
     {exp = (); ty = UNIT; pos}
   | IfExp {test; then_; else_; pos} ->
-    let%bind () = check_int venv tenv test
-    and {exp = _; ty = then_ty; pos = then_pos} = transExp venv tenv then_ in
+    let%bind () = check_int venv tenv ~in_loop test
+    and {exp = _; ty = then_ty; pos = then_pos} = transExp venv tenv ~in_loop then_ in
     (match else_ with
     | None ->
       let%map () = type_check then_pos UNIT then_ty in
       {exp = (); ty = UNIT; pos}
     | Some e ->
-      let%bind {exp = _; ty = else_ty; pos = else_pos} = transExp venv tenv e in
+      let%bind {exp = _; ty = else_ty; pos = else_pos} = transExp venv tenv ~in_loop e in
       let%map () = type_check else_pos then_ty else_ty in
       {exp = (); ty = then_ty; pos})
   | WhileExp {test; body; pos} ->
-    let%bind () = check_int venv tenv test
-    and {exp = _; ty = while_ty; pos = while_pos} = transExp venv tenv body in
+    let%bind () = check_int venv tenv ~in_loop test
+    and {exp = _; ty = while_ty; pos = while_pos} =
+      transExp venv tenv ~in_loop:true body
+    in
     let%map () = type_check while_pos UNIT while_ty in
     {exp = (); ty = UNIT; pos}
   | ForExp {var; escape = _; lo; hi; body; pos} ->
-    let%bind () = check_int venv tenv lo
-    and () = check_int venv tenv hi in
+    let%bind () = check_int venv tenv ~in_loop lo
+    and () = check_int venv tenv ~in_loop hi in
     let venv_with_var = add_entry_to_venv venv var (VarEntry {ty = INT}) in
-    let%map {exp = _; ty = _; pos = _} = transExp venv_with_var tenv body in
+    let%map {exp = _; ty = _; pos = _} =
+      transExp venv_with_var tenv ~in_loop:true body
+    in
     {exp = (); ty = UNIT; pos}
-  | BreakExp pos -> Ok {exp = (); ty = UNIT; pos}
+  | BreakExp pos ->
+    if in_loop
+    then Ok {exp = (); ty = UNIT; pos}
+    else sprintf "not in loop" |> Util.or_error_of_string pos
   | LetExp {decs; body; pos = _} ->
     let%bind venv', tenv' =
       List.fold_result decs ~init:(venv, tenv) ~f:(fun (accum_venv, accum_tenv) dec ->
-          transDec accum_venv accum_tenv dec )
+          transDec accum_venv accum_tenv ~in_loop dec )
     in
-    transExp venv' tenv' body
+    transExp venv' tenv' ~in_loop body
   | ArrayExp {typ; size; init; pos} ->
-    let%bind () = check_int venv tenv size
-    and {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
+    let%bind () = check_int venv tenv ~in_loop size
+    and {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv ~in_loop init in
     (match%bind lookup_actual_type pos tenv typ with
     | ARRAY (array_ty, _) as result_ty ->
       let%map () = type_check init_pos array_ty init_ty in
@@ -265,7 +273,7 @@ and transExp venv tenv (exp : Absyn.exp) =
       sprintf "expected array but found %s" (Type.to_string t)
       |> Util.or_error_of_string pos)
 
-and transDec venv tenv (dec : Absyn.dec) =
+and transDec venv tenv ~in_loop (dec : Absyn.dec) =
   let open Or_error.Let_syntax in
   match dec with
   | FunctionDec fundecs ->
@@ -314,13 +322,15 @@ and transDec venv tenv (dec : Absyn.dec) =
                    let var = Env.Entry.VarEntry {ty = param_type} in
                    add_entry_to_venv accum_venv name var )
           in
-          let%bind {exp = _; ty; pos} = transExp venv_with_params tenv body in
+          let%bind {exp = _; ty; pos} = transExp venv_with_params tenv ~in_loop body in
           type_check pos result_type ty )
       |> Or_error.all
     in
     venv_with_funcs, tenv
   | VarDec {name; escape = _; typ; init; pos} ->
-    let%bind {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
+    let%bind {exp = _; ty = init_ty; pos = init_pos} =
+      transExp venv tenv ~in_loop init
+    in
     let%bind expected_ty =
       match typ with
       | None when Type.equal init_ty NIL ->
@@ -367,6 +377,8 @@ and transDec venv tenv (dec : Absyn.dec) =
 
 let transProg (exp : Absyn.exp) =
   let open Or_error.Let_syntax in
-  let%map {exp = _; ty = _; pos = _} = transExp Env.base_venv Env.base_tenv exp in
+  let%map {exp = _; ty = _; pos = _} =
+    transExp Env.base_venv Env.base_tenv ~in_loop:false exp
+  in
   ()
 ;;
