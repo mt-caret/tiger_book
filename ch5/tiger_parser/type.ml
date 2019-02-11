@@ -87,3 +87,10 @@ let rec skip_names (pos : Lexing.position) (ty : t) =
       sprintf "dangling reference from type %s" sym |> Util.or_error_of_string pos)
   | t -> Ok t
 ;;
+
+let rec is_decided = function
+  | INT | STRING | UNIT | RECORD _ | ARRAY _ -> true
+  | NIL -> false
+  | NAME (_, t_opt_ref) ->
+    (match !t_opt_ref with None -> false | Some t -> is_decided t)
+;;
