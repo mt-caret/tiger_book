@@ -1,6 +1,5 @@
 open Core
 open Async
-open Semant
 
 let attempt_parse (lexbuf : Lexing.lexbuf) =
   Result.try_with (fun () -> Parser.program Lexer.read lexbuf)
@@ -19,12 +18,15 @@ let run_parser ~filename =
 let run_parser_param =
   let open Command.Let_syntax in
   let%map_open filename = anon ("filename" %: file) in
-  fun () -> run_parser ~filename >>| printf !"%{sexp:Absyn.exp Or_error.t}\n"
+  fun () ->
+    run_parser ~filename
+    >>| Or_error.bind ~f:Semant.transProg
+    >>| printf !"%{sexp:unit Or_error.t}\n"
 ;;
 
 let () =
   Command.async
-    ~summary:"Parses source code for the Tiger programming language"
+    ~summary:"Type checks source code for the Tiger programming language"
     run_parser_param
   |> Command.run
 ;;

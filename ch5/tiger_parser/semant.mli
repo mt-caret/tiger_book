@@ -10,7 +10,4 @@ type expty =
   ; pos : Lexing.position sexp_opaque }
 [@@deriving sexp]
 
-val transVar : Env.venv -> Env.tenv -> Absyn.var -> expty Or_error.t
-val transExp : Env.venv -> Env.tenv -> Absyn.exp -> expty Or_error.t
-val transDec : Env.venv -> Env.tenv -> Absyn.dec -> (Env.venv * Env.tenv) Or_error.t
-val transTy : Env.tenv -> Absyn.ty -> expty Or_error.t
+val transProg : Absyn.exp -> unit Or_error.t

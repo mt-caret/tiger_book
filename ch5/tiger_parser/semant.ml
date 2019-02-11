@@ -44,6 +44,28 @@ let add_entry_to_venv pos venv symbol (entry : Env.Entry.t) =
   | `Ok venv_with_entry -> Ok venv_with_entry
 ;;
 
+let transTy tenv (typ : Absyn.ty) =
+  (* here we use lookup_type instead of lookup_actual_type so we do not force
+     references to undefined types in NAMEs
+   *)
+  let open Or_error.Let_syntax in
+  match typ with
+  | NameTy (ty_name, pos) ->
+    let%map ty = lookup_type pos tenv ty_name in
+    {exp = (); ty; pos}
+  | RecordTy (fields, pos) ->
+    let%map field_list =
+      List.map fields ~f:(fun {name; escape = _; typ; pos = field_pos} ->
+          let%map field_ty = lookup_type field_pos tenv typ in
+          name, field_ty )
+      |> Or_error.all
+    in
+    {exp = (); ty = RECORD (field_list, Type.Unique.create ()); pos}
+  | ArrayTy (ty_name, pos) ->
+    let%map element_ty = lookup_type pos tenv ty_name in
+    {exp = (); ty = ARRAY (element_ty, Type.Unique.create ()); pos}
+;;
+
 let rec transVar venv tenv (var : Absyn.var) =
   let open Or_error.Let_syntax in
   match var with
@@ -114,8 +136,7 @@ and transExp venv tenv (exp : Absyn.exp) =
     and () = type_check posright INT tyright in
     {exp = (); ty = INT; pos}
   | RecordExp {fields; typ; pos} ->
-    let%bind ty = lookup_type pos tenv typ in
-    (match%bind Type.skip_names pos ty with
+    (match%bind lookup_actual_type pos tenv typ with
     | RECORD (expected_fields, _) as actual_ty ->
       let%map () =
         List.fold_result fields ~init:() ~f:(fun () (field, e, pos) ->
@@ -133,7 +154,7 @@ and transExp venv tenv (exp : Absyn.exp) =
         )
       in
       {exp = (); ty = actual_ty; pos}
-    | _ ->
+    | ty ->
       Type.to_string ty
       |> sprintf "expected record but found %s"
       |> Util.or_error_of_string pos)
@@ -159,7 +180,6 @@ and transExp venv tenv (exp : Absyn.exp) =
     and {exp = _; ty = _; pos = _} = transExp venv tenv body in
     {exp = (); ty = UNIT; pos}
   | ForExp {var; escape = _; lo; hi; body; pos} ->
-    (* TODO: deal with escape? *)
     let%bind () = check_int venv tenv lo
     and () = check_int venv tenv hi
     and venv_with_var = add_entry_to_venv pos venv var (VarEntry {ty = INT}) in
@@ -241,7 +261,6 @@ and transDec venv tenv (dec : Absyn.dec) =
     in
     venv_with_funcs, tenv
   | VarDec {name; escape = _; typ; init; pos} ->
-    (* TODO deal with escape *)
     let%bind {exp = _; ty = init_ty; pos = init_pos} = transExp venv tenv init in
     let%bind expected_ty =
       Option.map ~f:(fun (t, p) -> lookup_actual_type p tenv t) typ
@@ -266,25 +285,10 @@ and transDec venv tenv (dec : Absyn.dec) =
           type_check ty_pos rhs_ty named_type )
     in
     venv, tenv_with_types
+;;
 
-and transTy tenv (typ : Absyn.ty) =
-  (* here we use lookup_type instead of lookup_actual_type so we do not force
-     references to undefined types in NAMEs
-   *)
+let transProg (exp : Absyn.exp) =
   let open Or_error.Let_syntax in
-  match typ with
-  | NameTy (ty_name, pos) ->
-    let%map ty = lookup_type pos tenv ty_name in
-    {exp = (); ty; pos}
-  | RecordTy (fields, pos) ->
-    let%map field_list =
-      List.map fields ~f:(fun {name; escape = _; typ; pos = field_pos} ->
-          let%map field_ty = lookup_type field_pos tenv typ in
-          name, field_ty )
-      |> Or_error.all
-    in
-    {exp = (); ty = RECORD (field_list, Type.Unique.create ()); pos}
-  | ArrayTy (ty_name, pos) ->
-    let%map element_ty = lookup_type pos tenv ty_name in
-    {exp = (); ty = ARRAY (element_ty, Type.Unique.create ()); pos}
+  let%map {exp = _; ty = _; pos = _} = transExp Env.base_venv Env.base_tenv exp in
+  ()
 ;;

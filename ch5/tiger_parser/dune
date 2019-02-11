@@ -1,5 +1,5 @@
 (executable
-  (name tiger_parser)
+  (name main)
   (libraries async core_kernel)
   (preprocess (pps ppx_jane)))
 
