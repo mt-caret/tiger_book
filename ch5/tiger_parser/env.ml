@@ -13,6 +13,17 @@ type venv = Entry.t Symbol.Map.t [@@deriving sexp]
 let base_tenv = Symbol.Map.of_alist_exn ["int", Type.INT; "string", Type.STRING]
 
 let base_venv =
-  (* TODO: add predefined function bindings (p.114) *)
-  Symbol.Map.empty
+  Type.
+    [ "print", [STRING], UNIT
+    ; "flush", [], UNIT
+    ; "getchar", [], STRING
+    ; "ord", [STRING], INT
+    ; "chr", [INT], STRING
+    ; "size", [STRING], INT
+    ; "substring", [STRING; INT; INT], STRING
+    ; "concat", [STRING; STRING], STRING
+    ; "not", [INT], INT
+    ; "exit", [INT], UNIT ]
+  |> List.map ~f:(fun (name, formals, result) -> name, Entry.FunEntry {formals; result})
+  |> Symbol.Map.of_alist_exn
 ;;
