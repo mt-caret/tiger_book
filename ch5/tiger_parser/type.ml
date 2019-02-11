@@ -42,11 +42,28 @@ let rec to_string = function
     |> sprintf "%s (%s)" sym
 ;;
 
-let equal t1 t2 =
+let rec equal t1 t2 =
   match t1, t2 with
   | INT, INT | STRING, STRING | NIL, NIL | UNIT, UNIT -> true
   | ARRAY (_, u1), ARRAY (_, u2) -> Unique.equal u1 u2
   | RECORD (_, u1), RECORD (_, u2) -> Unique.equal u1 u2
-  | NAME _, _ | _, NAME _ -> failwith "equality defined only for actual types"
+  | NAME (_, t_opt_ref), _ ->
+    (match !t_opt_ref with
+    | Some t -> equal t t2
+    | None -> raise_s [%message "type equality error" (t1 : t) (t2 : t)])
+  | _, NAME (_, t_opt_ref) ->
+    (match !t_opt_ref with
+    | Some t -> equal t1 t
+    | None -> raise_s [%message "type equality error" (t1 : t) (t2 : t)])
   | _ -> false
+;;
+
+let rec skip_names (pos : Lexing.position) (ty : t) =
+  match ty with
+  | NAME (sym, t_opt_ref) ->
+    (match !t_opt_ref with
+    | Some t -> skip_names pos t
+    | None ->
+      sprintf "dangling reference from type %s" sym |> Util.or_error_of_string pos)
+  | t -> Ok t
 ;;

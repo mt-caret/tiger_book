@@ -1,3 +1,5 @@
+open Core_kernel
+
 module Unique : sig
   type t [@@deriving sexp, compare]
 
@@ -17,3 +19,4 @@ type t =
 
 val to_string : t -> string
 val equal : t -> t -> bool
+val skip_names : Lexing.position -> t -> t Or_error.t
