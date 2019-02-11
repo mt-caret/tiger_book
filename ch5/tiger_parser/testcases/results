@@ -1,11 +1,11 @@
 testcases/merge.tig
-(Error (" (line 4 column 16)" "function getchar not found"))
+(Ok ())
 testcases/queens.tig
-(Error (" (line 16 column 11)" "function print not found"))
+(Ok ())
 testcases/test1.tig
 (Ok ())
 testcases/test10.tig
-(Ok ())
+(Error (" (line 2 column 18)" "expected type UNIT but found INT"))
 testcases/test11.tig
 (Error (" (line 2 column 16)" "expected type INT but found STRING"))
 testcases/test12.tig
@@ -14,13 +14,16 @@ testcases/test13.tig
 (Error (" (line 3 column 8)" "expected type INT but found STRING"))
 testcases/test14.tig
 (Error
- ((" (line 12 column 5)"
-   "expected type INT but found { name: STRING, id: INT } (2)")
-  (" (line 12 column 12)" "expected type INT but found array (1) of INT")))
+ (" (line 12 column 12)"
+  "expected type { name: STRING, id: INT } (2) but found array (1) of INT"))
 testcases/test15.tig
-(Ok ())
+(Error (" (line 3 column 12)" "expected type UNIT but found INT"))
 testcases/test16.tig
-(Ok ())
+(Error
+ ((" (line 4 column 1)" "illegal cycle in a")
+  (" (line 5 column 1)" "illegal cycle in b")
+  (" (line 6 column 1)" "illegal cycle in c")
+  (" (line 7 column 1)" "illegal cycle in d")))
 testcases/test17.tig
 (Error (" (line 4 column 23)" "type treelist not found"))
 testcases/test18.tig
@@ -32,7 +35,7 @@ testcases/test2.tig
 testcases/test20.tig
 (Error (" (line 3 column 18)" "var i not found"))
 testcases/test21.tig
-(Ok ())
+(Error (" (line 8 column 13)" "expected type INT but found UNIT"))
 testcases/test22.tig
 (Error
  (" (line 7 column 6)"
@@ -46,7 +49,7 @@ testcases/test25.tig
 testcases/test26.tig
 (Error (" (line 3 column 9)" "expected type INT but found STRING"))
 testcases/test27.tig
-(Error (" (line 5 column 13)" "var a already exists"))
+(Ok ())
 testcases/test28.tig
 (Error
  (" (line 7 column 24)"
@@ -72,35 +75,31 @@ testcases/test35.tig
 testcases/test36.tig
 (Error (" (line 5 column 2)" "g expects 2 arguments but found 3"))
 testcases/test37.tig
-(Error (" (line 4 column 2)" "var a already exists"))
+(Ok ())
 testcases/test38.tig
-(Error (" (line 4 column 2)" "type a already exists"))
+(Error (" (line 3 column 2)" "duplicate definition of type a"))
 testcases/test39.tig
-(Error (" (line 4 column 2)" "function g already exists"))
+(Error (" (line 3 column 2)" "duplicate definition of function g"))
 testcases/test4.tig
 (Ok ())
 testcases/test40.tig
-(Ok ())
+(Error (" (line 3 column 22)" "expected type UNIT but found INT"))
 testcases/test41.tig
-(Error (" (line 6 column 3)" "type a already exists"))
+(Ok ())
 testcases/test42.tig
-(Error
- (" (line 22 column 8)"
-  "expected record but found rectype1 ({ name: STRING, address: STRING, id: INT, age: INT } (2))"))
+(Ok ())
 testcases/test43.tig
 (Error (" (line 6 column 2)" "expected type INT but found UNIT"))
 testcases/test44.tig
 (Ok ())
 testcases/test45.tig
-(Ok ())
+(Error (" (line 5 column 2)" "record type annotation required"))
 testcases/test46.tig
-(Error
- ((" (line 6 column 2)" "expected type INT but found NIL")
-  (" (line 6 column 6)" "expected type INT but found NIL")))
+(Ok ())
 testcases/test47.tig
-(Error (" (line 5 column 2)" "type a already exists"))
+(Ok ())
 testcases/test48.tig
-(Error (" (line 5 column 2)" "function g already exists"))
+(Ok ())
 testcases/test49.tig
 (Error (" (line 5 column 21)" "syntax error"))
 testcases/test5.tig

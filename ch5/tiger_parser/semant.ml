@@ -332,11 +332,11 @@ and transDec venv tenv ~in_loop (dec : Absyn.dec) =
       transExp venv tenv ~in_loop init
     in
     let%bind expected_ty =
-      match typ with
-      | None when Type.equal init_ty NIL ->
+      match typ, init_ty with
+      | None, NIL ->
         sprintf "record type annotation required" |> Util.or_error_of_string pos
-      | None -> Ok init_ty
-      | Some (t, p) -> lookup_actual_type p tenv t
+      | None, _ -> Ok init_ty
+      | Some (t, p), _ -> lookup_actual_type p tenv t
     in
     let%map () = type_check init_pos expected_ty init_ty in
     let venv_with_var = add_entry_to_venv venv name (VarEntry {ty = expected_ty}) in
